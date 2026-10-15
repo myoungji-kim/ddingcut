@@ -3,196 +3,474 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>띵컷 — 말 멈춘 곳을 알아서 잘라 주는 컷 편집</title>
-<meta name="description" content="촬영본에서 말이 멈춘 곳, '어'·'음', 같은 말 반복을 찾아 잘라 내고 자막을 만들어요. 결과는 프리미어 프로로 가져가요. 무료.">
-<meta property="og:title" content="띵컷 — 말 멈춘 곳을 알아서 잘라 주는 컷 편집">
-<meta property="og:description" content="무음 · 어·음 · 반복을 찾아 잘라 내고 자막을 만들어요. 프리미어 프로로 가져가요. 무료.">
-<meta property="og:image" content="https://myoungji-kim.github.io/ddingcut/screen.png">
+<title>띵컷 — 무음 · 어음 · 반복 자동 컷편집, 프리미어로 바로</title>
+<meta name="description" content="촬영본을 넣으면 말이 멈춘 곳, '어'·'음', 같은 말 반복을 찾아 자르고 자막까지 만들어 프리미어 프로 시퀀스로 넘겨요. 무료, 가입 없이, 영상은 내 컴퓨터 밖으로 나가지 않아요.">
+<link rel="canonical" href="https://myoungji-kim.github.io/ddingcut/">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://myoungji-kim.github.io/ddingcut/">
+<meta property="og:title" content="띵컷 — “어”, “음”, 말 멈춘 곳. 이제 손으로 안 잘라도 돼요">
+<meta property="og:description" content="무음 · 어음 · 반복을 자동으로 자르고 자막까지. 프리미어로 바로. 무료.">
+<meta property="og:image" content="https://myoungji-kim.github.io/ddingcut/img/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="icon.png">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"SoftwareApplication","name":"띵컷 (DDingCut)","applicationCategory":"MultimediaApplication","operatingSystem":"Windows 10, Windows 11, macOS 12+","offers":{"@type":"Offer","price":"0","priceCurrency":"KRW"},"url":"https://myoungji-kim.github.io/ddingcut/"}
+</script>
 <style>
-/* 색 · 크기는 띵컷 앱(web/ps.css)의 토큰을 옮겨 온 것이다. 앱과 같은 얼굴이어야 받아서 켰을 때 낯설지 않다. */
+/* 색은 띵컷 앱(web/ps.css)의 토큰을 옮겨 온 것이다. 받아서 켰을 때 같은 얼굴이어야 한다.
+   앱의 규칙도 따른다: 파랑은 쓰지 않는다(앱에서 "재생 위치"만 뜻한다), 주 단추는 밝기로, 굵기는 400 · 600. */
 @font-face { font-family: 'Pretendard'; font-weight: 400; font-display: swap; src: url(fonts/pretendard-400.woff2) format('woff2'); }
 @font-face { font-family: 'Pretendard'; font-weight: 600; font-display: swap; src: url(fonts/pretendard-600.woff2) format('woff2'); }
 :root {
   --bg-0: #F1F1F3; --bg-1: #FFFFFF; --bg-2: #F6F6F8; --line: #E8E8EC; --line-2: #D3D3D9;
-  --fg-1: #17171A; --fg-2: #4A4A53; --fg-3: #62626C;
-  --btn: #17171A; --on-btn: #FFFFFF;
-  --cut-silence: #5E7394; --cut-filler: #A07A00; --cut-repeat: #C2185B;
+  --fg-1: #17171A; --fg-2: #4A4A53; --fg-3: #62626C; --fg-4: #A3A3AC;
+  --btn: #17171A; --on-btn: #FFFFFF; --lane: #E6E6EA; --wave: #84848D;
+  --silence: #5E7394; --filler: #A07A00; --repeat: #C2185B;
+  --silence-soft: rgba(94, 115, 148, .16); --filler-soft: rgba(160, 122, 0, .14); --repeat-soft: rgba(194, 24, 91, .10);
   color-scheme: light;
 }
 @media (prefers-color-scheme: dark) {
   :root {
     --bg-0: #0F0F11; --bg-1: #17171A; --bg-2: #1E1E22; --line: #28282D; --line-2: #37373E;
-    --fg-1: #EDEDF0; --fg-2: #ABABB4; --fg-3: #8F8F99;
-    --btn: #EDEDF0; --on-btn: #111113;
-    --cut-silence: #8A9CB8; --cut-filler: #E6C44F; --cut-repeat: #E4649F;
+    --fg-1: #EDEDF0; --fg-2: #ABABB4; --fg-3: #8F8F99; --fg-4: #56565E;
+    --btn: #EDEDF0; --on-btn: #111113; --lane: #1B1B1F; --wave: #6A6A74;
+    --silence: #8A9CB8; --filler: #E6C44F; --repeat: #E4649F;
+    --silence-soft: rgba(138, 156, 184, .18); --filler-soft: rgba(230, 196, 79, .16); --repeat-soft: rgba(228, 100, 159, .16);
     color-scheme: dark;
   }
 }
 * { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
 body {
   margin: 0; background: var(--bg-0); color: var(--fg-1);
-  font: 400 16px/1.65 'Pretendard', -apple-system, 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
-  word-break: keep-all;
+  font: 400 17px/1.7 'Pretendard', -apple-system, 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+  word-break: keep-all; -webkit-font-smoothing: antialiased;
 }
-main { max-width: 960px; margin: 0 auto; padding: 56px 16px 32px; }
-a { color: inherit; }
-h1, h2, h3 { font-weight: 600; margin: 0; line-height: 1.3; }
-h1 { font-size: 40px; letter-spacing: -.02em; }
-h2 { font-size: 22px; margin-bottom: 16px; }
-h3 { font-size: 16px; margin-bottom: 6px; }
-p { margin: 0 0 12px; }
+a { color: inherit; text-underline-offset: 3px; }
+h1, h2, h3 { font-weight: 600; margin: 0; }
+p { margin: 0; }
+.wrap { max-width: 1152px; margin: 0 auto; padding: 0 24px; }
+.text { max-width: 640px; }
 .muted { color: var(--fg-3); }
-.small { font-size: 14px; }
+.num { font-variant-numeric: tabular-nums; }
 
-.hero { display: grid; gap: 20px; justify-items: start; }
-.brand { display: flex; align-items: center; gap: 14px; }
-.brand img { width: 56px; height: 56px; border-radius: 14px; }
-.lead { font-size: 19px; color: var(--fg-2); max-width: 36em; margin: 0; }
-.dot { display: inline-block; width: .6em; height: .6em; border-radius: 50%; margin: 0 .25em 0 .1em; vertical-align: .05em; }
+/* 위 막대 */
+.top { display: flex; align-items: center; justify-content: space-between; height: 64px; }
+.brand { display: flex; align-items: center; gap: 10px; font-weight: 600; text-decoration: none; }
+.brand img { width: 28px; height: 28px; border-radius: 7px; }
+.top a.small { font-size: 14px; color: var(--fg-2); }
 
-.get { display: flex; flex-wrap: wrap; gap: 8px; }
+/* 히어로 */
+.hero { padding: 96px 0 0; }
+.hero h1 { font-size: 56px; line-height: 1.2; letter-spacing: -.025em; }
+.hero .sub { margin-top: 20px; font-size: 20px; line-height: 1.6; color: var(--fg-2); max-width: 34em; }
+.get { margin-top: 36px; display: flex; flex-wrap: wrap; align-items: center; gap: 12px 20px; }
 .btn {
-  display: inline-flex; flex-direction: column; justify-content: center; min-height: 52px; padding: 8px 20px;
-  border-radius: 12px; border: 1px solid var(--line-2); background: var(--bg-1);
-  text-decoration: none; font-weight: 600; line-height: 1.3;
+  display: inline-flex; align-items: center; justify-content: center; height: 56px; padding: 0 28px;
+  border-radius: 12px; background: var(--btn); color: var(--on-btn); font-weight: 600; font-size: 17px; text-decoration: none;
 }
-.btn span { font-weight: 400; font-size: 13px; color: var(--fg-3); }
-.btn.main { background: var(--btn); color: var(--on-btn); border-color: var(--btn); }
-.btn.main span { color: inherit; opacity: .7; }
-.btn:focus-visible { outline: 2px solid var(--fg-1); outline-offset: 2px; }
-
-.shot { margin: 40px 0 0; }
-.shot img { display: block; width: 100%; height: auto; border-radius: 16px; border: 1px solid var(--line); }
-
-section { margin-top: 56px; }
-.card { background: var(--bg-1); border: 1px solid var(--line); border-radius: 16px; padding: 20px; }
-.grid { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
-.step { counter-increment: step; }
-.step h3::before { content: counter(step) '  '; color: var(--fg-3); }
-ol.plain { margin: 0; padding-left: 1.2em; }
-ol.plain li { margin-bottom: 4px; }
-code {
-  font: 13px ui-monospace, 'Cascadia Mono', Consolas, Menlo, monospace;
-  background: var(--bg-2); border: 1px solid var(--line); border-radius: 6px; padding: 1px 6px;
-  overflow-wrap: anywhere;
+.btn:hover { opacity: .9; }
+.btn:focus-visible, a:focus-visible, summary:focus-visible, button:focus-visible { outline: 2px solid var(--fg-1); outline-offset: 3px; }
+.other { font-size: 14px; color: var(--fg-3); }
+.other a { color: var(--fg-2); }
+.facts { margin-top: 14px; font-size: 14px; color: var(--fg-3); }
+.after {
+  margin-top: 16px; max-width: 640px; padding: 14px 18px; border-radius: 12px; background: var(--bg-1);
+  border: 1px solid var(--line); font-size: 15px;
 }
-pre { margin: 8px 0 0; white-space: pre-wrap; }
-table { width: 100%; border-collapse: collapse; font-size: 15px; }
-th, td { text-align: left; padding: 10px 0; border-top: 1px solid var(--line); vertical-align: top; }
-th { width: 9em; font-weight: 600; padding-right: 12px; }
-footer { margin-top: 64px; padding-top: 20px; border-top: 1px solid var(--line); font-size: 13px; color: var(--fg-3); }
+.after[hidden] { display: none; }
 
+/* 접히는 타임라인 — 샘플의 실제 컷 자리다 */
+.demo { margin-top: 72px; padding: 32px; border-radius: 20px; background: var(--bg-1); border: 1px solid var(--line); }
+.demo-head { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+.clock { font-size: 72px; line-height: 1; font-weight: 600; letter-spacing: -.02em; }
+.clock .from { color: var(--fg-4); font-size: 32px; margin-right: 12px; font-weight: 400; }
+.replay { font: inherit; font-size: 14px; color: var(--fg-2); background: none; border: 1px solid var(--line-2); border-radius: 999px; padding: 6px 14px; cursor: pointer; }
+.lanes { margin-top: 28px; display: grid; grid-template-columns: 56px 1fr; gap: 12px 16px; align-items: center; }
+.lanes > span { font-size: 14px; color: var(--fg-3); }
+.lane { display: flex; height: 56px; border-radius: 10px; overflow: hidden; background: var(--lane); width: 100%;
+  transition: width .8s cubic-bezier(.2, .8, .2, 1); }
+.seg { flex: var(--d) 1 0; min-width: 0; transition: flex-grow .8s cubic-bezier(.2, .8, .2, 1); }
+.seg.talk { background-repeat: repeat-x; background-position: center; }
+.seg.cut { background: transparent; transition: flex-grow .8s cubic-bezier(.2, .8, .2, 1), background-color .3s; }
+.lane.marked .seg.s { background: var(--silence); }
+.lane.marked .seg.f { background: var(--filler); }
+.lane.marked .seg.r { background: var(--repeat); }
+.lane.folded .seg.cut { flex-grow: 0; }
+.lane.folded { width: var(--kept); }
+.legend { margin-top: 16px; display: flex; flex-wrap: wrap; gap: 6px 20px; font-size: 14px; color: var(--fg-2); }
+.dot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-right: 6px; vertical-align: 1px; }
+.note { margin-top: 16px; font-size: 14px; color: var(--fg-3); }
+
+/* 섹션 */
+section { padding-top: 144px; }
+section h2 { font-size: 36px; line-height: 1.3; letter-spacing: -.02em; }
+section .lead { margin-top: 16px; font-size: 19px; color: var(--fg-2); }
+.body { margin-top: 40px; }
+
+/* 무엇을 자르나 — 실제 자막 줄을 인용하고 잘릴 말을 접는다 */
+.cuts { display: grid; gap: 0; border-top: 1px solid var(--line); }
+.cutrow { display: grid; grid-template-columns: 160px 1fr; gap: 24px; padding: 28px 0; border-bottom: 1px solid var(--line); align-items: baseline; }
+.tag { font-size: 15px; font-weight: 600; }
+.quote { font-size: 24px; line-height: 1.5; }
+.x { border-radius: 6px; text-decoration: line-through; text-decoration-thickness: 2px; margin-right: .25em; color: var(--fg-3); }
+.x.s { background: var(--silence-soft); text-decoration: none; padding: .1em .6em; font-size: .7em; vertical-align: .15em; white-space: nowrap; }
+.x.f { background: var(--filler-soft); text-decoration-color: var(--filler); padding: 0 .15em; }
+.x.r { background: var(--repeat-soft); text-decoration-color: var(--repeat); padding: 0 .15em; }
+
+/* 화면 */
+.shot { display: block; width: 100%; height: auto; border-radius: 16px; border: 1px solid var(--line); }
+.split { display: grid; grid-template-columns: 1fr 1.25fr; gap: 56px; align-items: center; }
+ul.ticks { margin: 24px 0 0; padding: 0; list-style: none; color: var(--fg-2); }
+ul.ticks li { padding: 6px 0; }
+ul.ticks li::before { content: '—'; color: var(--fg-4); margin-right: 10px; }
+
+/* 프리미어로 */
+.steps { display: grid; grid-template-columns: repeat(4, 1fr); gap: 32px; counter-reset: s; }
+.step { counter-increment: s; }
+.step::before { content: counter(s); display: block; font-size: 36px; line-height: 1; font-weight: 600; color: var(--fg-4); margin-bottom: 16px; }
+.step h3 { font-size: 17px; margin-bottom: 6px; }
+.step p { font-size: 15px; color: var(--fg-2); }
+kbd { font: 13px ui-monospace, 'Cascadia Mono', Consolas, Menlo, monospace; padding: 1px 6px; border: 1px solid var(--line-2); border-radius: 5px; background: var(--bg-1); }
+
+/* 정보 두 단 */
+dl.facts2 { margin: 0; display: grid; grid-template-columns: 200px 1fr; border-top: 1px solid var(--line); }
+dl.facts2 dt, dl.facts2 dd { margin: 0; padding: 20px 0; border-bottom: 1px solid var(--line); }
+dl.facts2 dt { font-weight: 600; padding-right: 24px; }
+dl.facts2 dd { color: var(--fg-2); }
+.fit { display: grid; grid-template-columns: 1fr 1fr; gap: 56px; }
+.fit h3 { font-size: 17px; margin-bottom: 8px; }
+
+/* 접힘 */
+details { border-bottom: 1px solid var(--line); }
+details:first-of-type { border-top: 1px solid var(--line); }
+summary { cursor: pointer; padding: 20px 0; font-weight: 600; list-style: none; display: flex; justify-content: space-between; gap: 16px; }
+summary::-webkit-details-marker { display: none; }
+summary::after { content: '+'; color: var(--fg-3); font-weight: 400; }
+details[open] summary::after { content: '−'; }
+details > div { padding: 0 0 24px; color: var(--fg-2); max-width: 720px; }
+details ol { margin: 0; padding-left: 1.3em; }
+details li { margin-bottom: 6px; }
+code { font: 14px ui-monospace, 'Cascadia Mono', Consolas, Menlo, monospace; background: var(--bg-2); border: 1px solid var(--line); border-radius: 6px; padding: 2px 6px; overflow-wrap: anywhere; }
+pre { margin: 10px 0 0; white-space: pre-wrap; }
+
+.final { text-align: center; padding: 160px 0 0; }
+.final h2 { font-size: 40px; }
+.final .get { justify-content: center; }
+footer { margin-top: 144px; padding: 28px 0 48px; border-top: 1px solid var(--line); font-size: 13px; color: var(--fg-3); }
+footer p + p { margin-top: 6px; }
+
+@media (max-width: 860px) {
+  .split, .fit { grid-template-columns: 1fr; gap: 32px; }
+  .steps { grid-template-columns: 1fr 1fr; }
+}
 @media (max-width: 600px) {
-  main { padding-top: 32px; }
-  h1 { font-size: 32px; }
-  .lead { font-size: 17px; }
-  .btn { flex: 1 1 100%; }
-  th { width: 6.5em; }
+  body { font-size: 16px; }
+  .wrap { padding: 0 16px; }
+  .hero { padding-top: 32px; }
+  .hero h1 { font-size: 34px; }
+  .hero .sub { font-size: 17px; }
+  .btn { width: 100%; }
+  .demo { margin-top: 48px; padding: 20px; }
+  .clock { font-size: 48px; }
+  .clock .from { font-size: 22px; }
+  .lane { height: 36px; }
+  .lanes { grid-template-columns: 36px 1fr; gap: 10px 10px; }
+  section { padding-top: 96px; }
+  section h2 { font-size: 26px; }
+  section .lead { font-size: 17px; }
+  .cutrow { grid-template-columns: 1fr; gap: 6px; padding: 20px 0; }
+  .quote { font-size: 19px; }
+  .steps { grid-template-columns: 1fr; gap: 24px; }
+  dl.facts2 { grid-template-columns: 1fr; }
+  dl.facts2 dt { padding-bottom: 0; border-bottom: 0; }
+  dl.facts2 dd { padding-top: 4px; }
+  .final { padding-top: 96px; }
+  .final h2 { font-size: 28px; }
+  footer { margin-top: 96px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .seg, .lane { transition: none !important; }
 }
 </style>
 </head>
 <body>
-<main>
+<div class="wrap">
+  <nav class="top">
+    <a class="brand" href="#"><img src="icon.png" alt="">띵컷</a>
+    <a class="small" href="#get-final">받기</a>
+  </nav>
+
   <header class="hero">
-    <div class="brand">
-      <img src="icon.png" alt="">
-      <h1>띵컷</h1>
+    <h1>“어”, “음”, 말 멈춘 곳.<br>이제 손으로 안 잘라도 돼요</h1>
+    <p class="sub">촬영본을 넣으면 잘릴 곳과 자막이 나와요. 프리미어에서 가져오기 한 번이면 잘린 시퀀스와 자막이 들어와요.</p>
+    <div class="get" data-get>
+      <a class="btn" data-dl href="https://github.com/myoungji-kim/ddingcut/releases/latest/download/DDingCut-Setup.exe">Windows용 무료로 받기</a>
+      <span class="other">다른 컴퓨터:
+        <a href="https://github.com/myoungji-kim/ddingcut/releases/latest/download/DDingCut-Setup.exe">Windows</a> ·
+        <a href="https://github.com/myoungji-kim/ddingcut/releases/latest/download/DDingCut-mac-arm64.dmg">Mac (M칩)</a> ·
+        <a href="https://github.com/myoungji-kim/ddingcut/releases/latest/download/DDingCut-mac-x64.dmg">Mac (Intel)</a>
+      </span>
     </div>
-    <p class="lead">
-      촬영본에서 <span class="dot" style="background:var(--cut-silence)"></span>말이 멈춘 곳,
-      <span class="dot" style="background:var(--cut-filler)"></span>“어”·“음”,
-      <span class="dot" style="background:var(--cut-repeat)"></span>같은 말 반복을 찾아 잘라 내요.
-      자막도 만들어요. 결과는 프리미어 프로로 그대로 가져가요.
-    </p>
-    <div class="get">
-      <a class="btn main" id="win" href="https://github.com/myoungji-kim/ddingcut/releases/latest/download/DDingCut-Setup.exe">Windows용 받기<span>Windows 10 · 11</span></a>
-      <a class="btn" id="mac-arm" href="https://github.com/myoungji-kim/ddingcut/releases/latest/download/DDingCut-mac-arm64.dmg">Mac용 받기<span>M1 · M2 · M3 · M4</span></a>
-      <a class="btn" id="mac-x64" href="https://github.com/myoungji-kim/ddingcut/releases/latest/download/DDingCut-mac-x64.dmg">Mac용 받기<span>Intel</span></a>
-    </div>
-    <p class="muted small">무료예요. 가입하지 않아도 돼요. · <a href="https://github.com/myoungji-kim/ddingcut/releases">판마다 달라진 것</a></p>
+    <p class="facts">프리미어 프로 쓰는 분용 · 무료, 가입 없음 · 영상은 내 컴퓨터 밖으로 나가지 않아요<span data-ver></span></p>
+    <p class="after" data-after hidden>받는 중이에요. 처음 켤 때 경고 창이 한 번 떠요 — <a href="#install">넘기는 법 보기</a></p>
   </header>
 
-  <figure class="shot">
-    <img src="screen.png" width="2880" height="1800" alt="띵컷 작업 화면. 가운데에 자막 줄이 있고 줄마다 잘린 길이가 붙어 있다. 아래 타임라인에는 무음 · 어·음 · 반복 구간이 색으로 표시되고, 왼쪽에 1분 12초가 46초로 줄었다고 나온다.">
+  <figure class="demo" aria-label="샘플 72초 영상의 타임라인. 무음, 어·음, 반복 구간이 잘려 1분 12초가 46초가 된다." style="margin-left:0;margin-right:0">
+    <div class="demo-head">
+      <div class="clock num" aria-hidden="true"><span class="from">1:12 →</span><span data-clock>1:12</span></div>
+      <button class="replay" type="button" data-replay>다시 보기</button>
+    </div>
+    <div class="lanes" aria-hidden="true">
+      <span>원본</span><div class="lane" data-lane></div>
+      <span>띵컷</span><div class="lane" data-lane></div>
+    </div>
+    <div class="legend" aria-hidden="true">
+      <span><span class="dot" style="background:var(--silence)"></span>무음 6</span>
+      <span><span class="dot" style="background:var(--filler)"></span>어·음 3</span>
+      <span><span class="dot" style="background:var(--repeat)"></span>반복 2</span>
+    </div>
+    <figcaption class="note">앱에 든 72초 샘플 그대로예요. 실제 6분 45초 브이로그는 6분 15초가 됐어요 — 말이 빽빽한 영상일수록 덜 줄어요.</figcaption>
   </figure>
 
-  <section>
-    <h2>이렇게 써요</h2>
-    <div class="grid" style="counter-reset: step">
-      <div class="card step">
-        <h3>영상을 넣어요</h3>
-        <p class="muted">창에 끌어다 놓으면 돼요. 여러 개를 넣으면 차례대로 이어 붙여요.</p>
+  <section aria-labelledby="h-what">
+    <h2 id="h-what">세 가지를 찾아 잘라요</h2>
+    <p class="lead text">말소리를 듣고 글로 받아 적은 뒤에 찾아요. 그래서 소리 크기만으로는 못 찾는 “어”와 되풀이한 말도 잡아요.</p>
+    <div class="cuts body">
+      <div class="cutrow">
+        <span class="tag"><span class="dot" style="background:var(--silence)"></span>말이 멈춘 곳</span>
+        <p class="quote">제가 일주일 동안 들고 다녀봤는데요. <span class="x f">음</span><span class="x s">8.6초 정적</span>무게가 거의 느껴지지 않았습니다.</p>
       </div>
-      <div class="card step">
-        <h3>들으면서 확인해요</h3>
-        <p class="muted">잘릴 곳이 자막 줄마다 표시돼요. 틀린 자막은 글처럼 고치고, 살리고 싶은 컷은 눌러서 되살려요.</p>
+      <div class="cutrow">
+        <span class="tag"><span class="dot" style="background:var(--filler)"></span>“어” · “음”</span>
+        <p class="quote"><span class="x f">어</span>보시면 아시겠지만 크기가 생각보다 훨씬 작습니다.</p>
       </div>
-      <div class="card step">
-        <h3>프리미어로 가져가요</h3>
-        <p class="muted">[프리미어용 파일 저장] → 프리미어에서 <b>파일 → 가져오기</b>. 잘린 시퀀스와 자막이 들어와요.</p>
-      </div>
-    </div>
-  </section>
-
-  <section>
-    <h2>처음 켤 때 한 번 막혀요</h2>
-    <p>띵컷은 아직 서명하지 않은 프로그램이라, 처음 한 번은 운영체제가 경고 창을 띄워요. 아래처럼 넘기면 다음부터는 바로 켜져요.</p>
-    <div class="grid">
-      <div class="card">
-        <h3>Windows</h3>
-        <ol class="plain">
-          <li>“Windows의 PC 보호” 창에서 <b>[추가 정보]</b>를 눌러요.</li>
-          <li><b>[실행]</b>을 눌러요.</li>
-        </ol>
-      </div>
-      <div class="card">
-        <h3>Mac</h3>
-        <ol class="plain">
-          <li>받은 dmg 를 열어 띵컷을 <b>응용 프로그램</b> 폴더로 끌어다 놓아요.</li>
-          <li>막히면 <b>[완료]</b> → <b>시스템 설정 → 개인정보 보호 및 보안</b> 맨 아래의 <b>[그래도 열기]</b>.</li>
-          <li>“손상되었기 때문에 열 수 없습니다”가 뜨면 터미널에 한 번 붙여 넣어요.
-            <pre><code>xattr -dr com.apple.quarantine /Applications/DDingCut.app</code></pre>
-          </li>
-        </ol>
+      <div class="cutrow">
+        <span class="tag"><span class="dot" style="background:var(--repeat)"></span>같은 말 반복</span>
+        <p class="quote"><span class="x r">그래서 이제</span>그래서 이제 휴대성이 정말 좋아요.</p>
       </div>
     </div>
   </section>
 
-  <section>
-    <h2>알아 두면 좋아요</h2>
-    <div class="card">
-      <table>
-        <tr><th>내 컴퓨터 안에서</th><td>영상과 소리는 밖으로 나가지 않아요. 자막도 이 컴퓨터에서 만들어요.</td></tr>
-        <tr><th>처음 켜면</th><td>자막 만드는 도구를 뒤에서 받아요(약 2GB, NVIDIA 그래픽카드가 있으면 1.3GB 더). 몇 분 걸리고, 그동안에도 컷 편집은 돼요. 한 번 받으면 인터넷 없이 써요.</td></tr>
-        <tr><th>필요한 것</th><td>Windows 10 · 11(64비트) 또는 macOS 12 이상. 빈 공간 5GB. 프리미어 프로(XML 가져오기가 되는 판).</td></tr>
-        <tr><th>자막 정확도</th><td>고유명사 · 신조어, 겹쳐 말하기, 큰 배경음악에서는 틀리거나 빠뜨려요. 그래서 자막을 글로 고치고 한꺼번에 찾아 바꾸는 화면이 있어요.</td></tr>
-      </table>
+  <section aria-labelledby="h-edit">
+    <div class="split">
+      <div>
+        <h2 id="h-edit">자막은 글처럼 고쳐요</h2>
+        <p class="lead">잘린 결과를 들으면서, 틀린 자막은 그 자리에서 고쳐요. 살리고 싶은 컷은 눌러서 되살려요.</p>
+        <ul class="ticks">
+          <li>듣는 줄을 따라 커서가 내려가요</li>
+          <li>한꺼번에 찾아 바꾸기, 줄 합치기 · 나누기</li>
+          <li>덜 자르기 · 보통 · 더 자르기 한 번에 고르기</li>
+          <li>잘못 눌러도 <kbd>Ctrl</kbd>+<kbd>Z</kbd></li>
+        </ul>
+      </div>
+      <picture>
+        <source srcset="img/sl-dark.webp" media="(prefers-color-scheme: dark)">
+        <img class="shot" src="img/sl-light.webp" width="1376" height="1312" loading="lazy" alt="띵컷의 자막 고치기 화면. 자막 줄마다 시각과 잘린 길이(-0.4초, -1.0초)가 붙어 있고, 한 줄은 고치는 중이다.">
+      </picture>
     </div>
   </section>
 
-  <section>
-    <h2>안 되거나 이상하면</h2>
-    <p>어떤 영상에서 무엇이 이상했는지 알려 주세요. 고쳐서 새 판으로 내요.</p>
-    <div class="get">
-      <a class="btn main" href="https://github.com/myoungji-kim/ddingcut/issues/new?template=bug.yml">문제 알리기<span>GitHub 계정이 필요해요</span></a>
-      <a class="btn" href="https://github.com/myoungji-kim/ddingcut/issues">다른 사람이 알린 것 보기<span>같은 문제가 있는지</span></a>
+  <section aria-labelledby="h-pr">
+    <h2 id="h-pr">프리미어로 그대로</h2>
+    <p class="lead text">컷은 시퀀스로, 자막은 캡션 트랙으로 들어와요. 프리미어에서 이어서 편집하면 돼요.</p>
+    <div class="steps body">
+      <div class="step"><h3>저장</h3><p>[프리미어용 파일 저장]을 누르면 XML · 자막 SRT 를 한꺼번에 저장해요.</p></div>
+      <div class="step"><h3>가져오기</h3><p>프리미어에서 <b>파일 → 가져오기</b>(<kbd>Ctrl</kbd>+<kbd>I</kbd>)로 .xml 을 열면 시퀀스가 생겨요.</p></div>
+      <div class="step"><h3>열기</h3><p>그 시퀀스를 두 번 눌러 타임라인에 열어요.</p></div>
+      <div class="step"><h3>자막 얹기</h3><p>.srt 도 가져온 뒤 타임라인 위로 끌어다 놓으면 캡션 트랙이 돼요.</p></div>
     </div>
+  </section>
+
+  <section aria-labelledby="h-fit">
+    <h2 id="h-fit">이런 분께 맞아요</h2>
+    <div class="fit body">
+      <div>
+        <h3>잘 맞아요</h3>
+        <ul class="ticks" style="margin-top:0">
+          <li>프리미어 프로로 편집해요</li>
+          <li>혼자 말하는 영상 — 브이로그, 리뷰, 강의</li>
+          <li>컷편집에 하루가 다 가요</li>
+        </ul>
+      </div>
+      <div>
+        <h3>덜 맞아요</h3>
+        <ul class="ticks" style="margin-top:0">
+          <li>프리미어를 안 써요 — 자막 파일(SRT)만 쓸 수 있어요</li>
+          <li>말이 거의 없는 영상</li>
+          <li>여럿이 겹쳐 말하는 영상 — 자막이 자주 틀려요</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section aria-labelledby="h-local">
+    <h2 id="h-local">내 컴퓨터 안에서 돌아요</h2>
+    <dl class="facts2 body">
+      <dt>영상은 그대로</dt><dd>영상과 소리는 밖으로 나가지 않아요. 자막도 이 컴퓨터에서 만들어요. 가입도 없어요.</dd>
+      <dt>처음 켜면</dt><dd>자막 만드는 도구를 뒤에서 받아요(약 2GB, NVIDIA 그래픽카드가 있으면 1.3GB 더). 그동안 [샘플로 둘러보기]나 컷 편집부터 해 보세요. 한 번 받으면 인터넷 없이 써요.</dd>
+      <dt>필요한 것</dt><dd>Windows 10 · 11(64비트) 또는 macOS 12 이상. 빈 공간 5GB. 프리미어 프로.</dd>
+      <dt>자막 정확도</dt><dd>고유명사 · 신조어, 큰 배경음악에서는 틀리거나 빠뜨려요. 그래서 고치는 화면을 공들여 만들었어요.</dd>
+    </dl>
+  </section>
+
+  <section aria-labelledby="h-faq" id="install">
+    <h2 id="h-faq">자주 묻는 것</h2>
+    <div class="body">
+      <details data-os="win">
+        <summary>Windows 에서 “PC 보호” 창이 떠요</summary>
+        <div>
+          <ol>
+            <li>“Windows의 PC 보호” 창에서 <b>[추가 정보]</b>를 눌러요.</li>
+            <li><b>[실행]</b>을 눌러요. 다음부터는 바로 켜져요.</li>
+          </ol>
+        </div>
+      </details>
+      <details data-os="mac">
+        <summary>Mac 에서 “열 수 없습니다”가 떠요</summary>
+        <div>
+          <ol>
+            <li>받은 dmg 를 열어 띵컷을 <b>응용 프로그램</b> 폴더로 끌어다 놓아요.</li>
+            <li>막히면 <b>[완료]</b> → <b>시스템 설정 → 개인정보 보호 및 보안</b> 맨 아래의 <b>[그래도 열기]</b>.</li>
+            <li>“손상되었기 때문에 열 수 없습니다”가 뜨면 터미널에 한 번 붙여 넣어요.
+              <pre><code>xattr -dr com.apple.quarantine /Applications/DDingCut.app</code></pre></li>
+          </ol>
+        </div>
+      </details>
+      <details>
+        <summary>경고가 뜨는데 안전한가요?</summary>
+        <div><p>개인이 만든 프로그램이라 아직 코드 서명 인증서를 사지 않았어요. 그래서 운영체제가 “누가 만들었는지 모른다”고 알리는 것이고, 바이러스로 판정한 것이 아니에요. 띵컷은 이 페이지와 <a href="https://github.com/myoungji-kim/ddingcut/releases">GitHub 릴리스</a>에서만 받으세요.</p></div>
+      </details>
+      <details>
+        <summary>내 Mac 이 M칩인지 Intel 인지 모르겠어요</summary>
+        <div><p>화면 왼쪽 위 애플 메뉴 → <b>이 Mac에 관하여</b>. “칩”에 Apple M… 이 적혀 있으면 M칩, “프로세서”에 Intel 이 적혀 있으면 Intel 이에요.</p></div>
+      </details>
+      <details>
+        <summary>컷이 틀리게 잘리면요?</summary>
+        <div><p>컷마다 들어 보고 켜거나 끌 수 있어요. 전체를 [덜 자르기 · 보통 · 더 자르기]로 바꾸고, 경계는 끌어서 옮겨요. 잘못 눌러도 <kbd>Ctrl</kbd>+<kbd>Z</kbd> 로 돌아가요.</p></div>
+      </details>
+      <details>
+        <summary>프리미어가 없으면 못 쓰나요?</summary>
+        <div><p>잘린 영상은 프리미어 시퀀스로만 넘어가요. 자막은 SRT 파일로 따로 저장할 수 있어서 다른 편집기에서도 쓸 수 있어요.</p></div>
+      </details>
+    </div>
+  </section>
+
+  <div class="final" id="get-final">
+    <h2>오늘 찍은 영상으로 해 보세요</h2>
+    <div class="get" data-get>
+      <a class="btn" data-dl href="https://github.com/myoungji-kim/ddingcut/releases/latest/download/DDingCut-Setup.exe">Windows용 무료로 받기</a>
+    </div>
+    <p class="facts">안 되거나 이상하면 <a href="https://github.com/myoungji-kim/ddingcut/issues/new?template=bug.yml">알려 주세요</a> — 고쳐서 새 판으로 내요.</p>
+  </div>
+
+  <section aria-label="전체 화면" style="padding-top:120px">
+    <picture>
+      <source srcset="img/full-dark.webp" media="(prefers-color-scheme: dark)">
+      <img class="shot" src="img/full-light.webp" width="2880" height="1800" loading="lazy" alt="띵컷 전체 화면. 왼쪽에 클립과 줄어든 길이, 가운데에 자막 목록, 오른쪽에 미리보기와 설정, 아래에 컷 구간이 색으로 표시된 타임라인.">
+    </picture>
   </section>
 
   <footer>
-    자막은 OpenAI 의 Whisper large-v3-turbo 모델을 <a href="https://github.com/SYSTRAN/faster-whisper">faster-whisper</a> 로 돌려 만들어요(둘 다 MIT).
-    글꼴은 <a href="https://github.com/orioncactus/pretendard">Pretendard</a>(SIL OFL 1.1).
-    Premiere Pro 는 Adobe 의 상표이고, 띵컷은 Adobe 와 관계없는 개인 프로젝트예요.
+    <p>자막은 OpenAI 의 Whisper large-v3-turbo 모델을 <a href="https://github.com/SYSTRAN/faster-whisper">faster-whisper</a> 로 돌려 만들어요(둘 다 MIT). 글꼴은 <a href="https://github.com/orioncactus/pretendard">Pretendard</a>(SIL OFL 1.1).</p>
+    <p>Premiere Pro 는 Adobe 의 상표이고, 띵컷은 Adobe 와 관계없는 개인 프로젝트예요. · <a href="https://github.com/myoungji-kim/ddingcut">GitHub</a></p>
   </footer>
-</main>
+</div>
+
 <script>
-  // 맥에서 들어오면 맥 단추를 앞에 세운다. 칩(M · Intel)은 브라우저가 알려 주지 않아 둘 다 둔다.
-  if (/Mac/.test(navigator.platform) || /Macintosh/.test(navigator.userAgent)) {
-    var win = document.getElementById('win'), arm = document.getElementById('mac-arm');
-    win.classList.remove('main'); arm.classList.add('main');
-    win.parentNode.appendChild(win);
+(function () {
+  var REL = 'https://github.com/myoungji-kim/ddingcut/releases/latest/download/';
+  var ua = navigator.userAgent, mac = /Macintosh|Mac OS X/.test(ua) && !/iPhone|iPad/.test(ua);
+  var os = mac ? 'mac' : 'win';
+
+  // 맥이면 대표 단추를 M칩판으로. 칩 종류는 브라우저가 알려 주지 않아 Intel 은 "다른 컴퓨터"에 둔다.
+  document.querySelectorAll('[data-dl]').forEach(function (a) {
+    if (mac) { a.href = REL + 'DDingCut-mac-arm64.dmg'; a.textContent = 'Mac용 무료로 받기'; }
+    a.addEventListener('click', function () {
+      var after = document.querySelector('[data-after]');
+      after.hidden = false;
+      var d = document.querySelector('details[data-os="' + os + '"]');
+      if (d) d.open = true;
+    });
+  });
+
+  // 판 번호 · 날짜 · 크기. 릴리스가 아직 없거나 API 가 막히면 그냥 비워 둔다.
+  fetch('https://api.github.com/repos/myoungji-kim/ddingcut/releases/latest').then(function (r) { return r.ok ? r.json() : null; }).then(function (rel) {
+    if (!rel) return;
+    var name = mac ? 'DDingCut-mac-arm64.dmg' : 'DDingCut-Setup.exe';
+    var asset = (rel.assets || []).filter(function (x) { return x.name === name; })[0];
+    var bits = [rel.tag_name, (rel.published_at || '').slice(0, 10)];
+    if (asset) bits.push(Math.round(asset.size / 1048576) + 'MB');
+    document.querySelector('[data-ver]').textContent = ' · ' + bits.filter(Boolean).join(' · ');
+  }).catch(function () {});
+
+  // 샘플 72초의 컷 자리(초). 앱의 샘플(src/web/sample.ts)을 넣었을 때 타임라인에 그려진 그대로다.
+  // ponytail: 손으로 옮겨 적었다. 샘플을 바꾸면 여기도 다시 잰다.
+  var TOTAL = 72, END = 46;
+  var CUTS = [[0, 2.8, 's'], [7.5, 1.0, 'f'], [19.1, 1.0, 'r'], [27.4, 8.6, 's'], [42.0, 0.9, 'f'],
+              [45.9, 2.3, 's'], [51.7, 0.9, 'r'], [58.1, 2.8, 's'], [66.7, 5.3, 's']];
+  var lanes = document.querySelectorAll('[data-lane]'), lane = lanes[1];
+  var t = 0, seed = 7, cut = 0;
+  function rnd() { seed = (seed * 9301 + 49297) % 233280; return seed / 233280; }
+  function wave(len) {
+    // 말 구간의 막대 파형. 정해진 씨앗이라 새로고침해도 모양이 같다.
+    var n = Math.max(2, Math.round(len * 3)), w = 6 * n, bars = '';
+    for (var i = 0; i < n; i++) { var h = 14 + Math.round(rnd() * 34); bars += '<rect x="' + (i * 6 + 1.5) + '" y="' + (32 - h / 2) + '" width="3" height="' + h + '" rx="1.5"/>'; }
+    return 'url("data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="' + w + '" height="64"><g fill="' + getComputedStyle(document.documentElement).getPropertyValue('--wave').trim() + '">' + bars + '</g></svg>') + '")';
   }
+  function add(dur, cls) {
+    var bg = cls === 'talk' ? wave(dur) : '';
+    lanes.forEach(function (l) {
+      var el = document.createElement('div');
+      el.className = 'seg ' + cls;
+      el.style.setProperty('--d', dur);
+      if (bg) { el.style.backgroundImage = bg; el.style.backgroundSize = 'auto 100%'; }
+      l.appendChild(el);
+    });
+  }
+  CUTS.forEach(function (c) {
+    if (c[0] > t) add(c[0] - t, 'talk');
+    add(c[1], 'cut ' + c[2]);
+    t = c[0] + c[1]; cut += c[1];
+  });
+  if (t < TOTAL) add(TOTAL - t, 'talk');
+  lanes[0].classList.add('marked');
+  lane.style.setProperty('--kept', ((TOTAL - cut) / TOTAL * 100) + '%');
+
+  var clock = document.querySelector('[data-clock]');
+  function fmt(s) { s = Math.round(s); return Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0'); }
+  var still = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var timers = [];
+  function reset() {
+    timers.forEach(clearTimeout); timers = [];
+    lane.classList.remove('marked', 'folded'); clock.textContent = fmt(TOTAL);
+  }
+  function play() {
+    reset();
+    if (still) { lane.classList.add('marked', 'folded'); clock.textContent = fmt(END); return; }
+    timers.push(setTimeout(function () { lane.classList.add('marked'); }, 500));
+    timers.push(setTimeout(function () {
+      lane.classList.add('folded');
+      var t0 = performance.now();
+      (function tick(now) {
+        var k = Math.min(1, (now - t0) / 800), e = 1 - Math.pow(1 - k, 3);
+        clock.textContent = fmt(TOTAL - (TOTAL - END) * e);
+        if (k < 1) requestAnimationFrame(tick);
+      })(t0);
+    }, 1600));
+  }
+  document.querySelector('[data-replay]').addEventListener('click', play);
+
+  function once(el, fn) {
+    if (!('IntersectionObserver' in window)) return fn();
+    var io = new IntersectionObserver(function (es) { if (es[0].isIntersecting) { io.disconnect(); fn(); } }, { threshold: .5 });
+    io.observe(el);
+  }
+  once(lane, play);
+})();
 </script>
 </body>
 </html>

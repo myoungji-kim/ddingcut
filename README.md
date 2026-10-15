@@ -5,7 +5,7 @@
 
 **→ [소개 페이지에서 받기](https://myoungji-kim.github.io/ddingcut/)**
 
-![띵컷 작업 화면](screen.png)
+![띵컷 — 1:12 가 0:46 으로](img/og.png)
 
 ## 받기
 
