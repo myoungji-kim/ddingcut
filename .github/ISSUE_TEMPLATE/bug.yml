@@ -1,0 +1,41 @@
+name: 문제 알리기
+description: 안 되거나, 이상하게 잘리거나, 꺼지는 것
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        알려 주셔서 고마워요. 영상 파일은 올리지 않아도 돼요 — 어떤 영상인지만 적어 주세요.
+  # id 는 앱의 [문제 알리기] 가 주소 뒤에 ?version=…&os=… 로 미리 채운다. 바꾸면 앱도 바꾼다.
+  - type: input
+    id: version
+    attributes:
+      label: 띵컷 판
+      description: 앱의 [문제 알리기] 로 열면 저절로 채워져요. 모르면 비워 두세요.
+      placeholder: 예) 1.0.0
+  - type: input
+    id: os
+    attributes:
+      label: 컴퓨터
+      placeholder: 예) Windows 11 · NVIDIA RTX 3060 / Mac M2
+    validations:
+      required: true
+  - type: textarea
+    id: what
+    attributes:
+      label: 무엇이 이상했나요
+      description: 무엇을 했더니, 무엇이 일어났는지. 화면을 찍어 붙여 넣으면 가장 빨라요.
+    validations:
+      required: true
+  - type: input
+    id: file
+    attributes:
+      label: 어떤 영상이었나요
+      description: 찍은 기기 · 파일 형식 · 길이
+      placeholder: 예) 아이폰 15 · mov · 12분
+  - type: textarea
+    id: log
+    attributes:
+      label: 기록
+      description: 오류 창에 나온 글이 있으면 그대로 붙여 넣어 주세요.
+      render: text
