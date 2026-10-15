@@ -3,13 +3,13 @@
 촬영본에서 **말이 멈춘 곳 · "어"·"음" · 같은 말 반복**을 찾아 잘라 내고 자막을 만들어요.
 결과는 프리미어 프로로 그대로 가져가요. 무료예요.
 
-**→ [소개 페이지에서 받기](https://myoungji-kim.github.io/ddingcut-app/)**
+**→ [소개 페이지에서 받기](https://myoungji-kim.github.io/ddingcut/)**
 
 ![띵컷 작업 화면](screen.png)
 
 ## 받기
 
-[Releases](https://github.com/myoungji-kim/ddingcut-app/releases/latest) 의 맨 위 판에서 받아요.
+[Releases](https://github.com/myoungji-kim/ddingcut/releases/latest) 의 맨 위 판에서 받아요.
 
 | 컴퓨터 | 파일 |
 | --- | --- |
@@ -32,8 +32,8 @@
 
 ## 문제 알리기
 
-[여기](https://github.com/myoungji-kim/ddingcut-app/issues/new?template=bug.yml)에 적어 주세요. 제안 · 질문은
-[빈 이슈](https://github.com/myoungji-kim/ddingcut-app/issues/new)로 받아요.
+[여기](https://github.com/myoungji-kim/ddingcut/issues/new?template=bug.yml)에 적어 주세요. 제안 · 질문은
+[빈 이슈](https://github.com/myoungji-kim/ddingcut/issues/new)로 받아요.
 
 ## 이 저장소
 
