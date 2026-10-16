@@ -4,12 +4,12 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>띵컷 — 무음 · 어음 · 반복 자동 컷편집, 프리미어로 바로</title>
-<meta name="description" content="촬영본을 넣으면 말이 멈춘 곳, '어'·'음', 같은 말 반복을 찾아 자르고 자막까지 만들어 프리미어 프로 시퀀스로 넘겨요. 무료, 가입 없이, 영상은 내 컴퓨터 밖으로 나가지 않아요.">
+<meta name="description" content="찍는 건 10분, 자르는 건 한나절. 띵컷이 먼저 들어 보고 말이 멈춘 곳, ‘어’·‘음’, 같은 말 반복을 잘라 프리미어 시퀀스로 넘겨요. 무료, 가입 없이, 내 컴퓨터 안에서.">
 <link rel="canonical" href="https://myoungji-kim.github.io/ddingcut/">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://myoungji-kim.github.io/ddingcut/">
-<meta property="og:title" content="띵컷 — “어”, “음”, 말 멈춘 곳. 이제 손으로 안 잘라도 돼요">
-<meta property="og:description" content="무음 · 어음 · 반복을 자동으로 자르고 자막까지. 프리미어로 바로. 무료.">
+<meta property="og:title" content="띵컷 — 찍는 건 10분, 자르는 건 한나절">
+<meta property="og:description" content="띵컷이 먼저 들어 보고 무음 · 어음 · 반복을 잘라 프리미어로 넘겨요. 무료.">
 <meta property="og:image" content="https://myoungji-kim.github.io/ddingcut/img/og.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
@@ -26,18 +26,20 @@
 :root {
   --bg-0: #F1F1F3; --bg-1: #FFFFFF; --bg-2: #F6F6F8; --line: #E8E8EC; --line-2: #D3D3D9;
   --fg-1: #17171A; --fg-2: #4A4A53; --fg-3: #62626C; --fg-4: #A3A3AC;
-  --btn: #17171A; --on-btn: #FFFFFF; --lane: #E6E6EA; --wave: #84848D;
+  --bg-3: #ECECEF; --shadow: 0 16px 40px rgba(16, 16, 24, .14), 0 2px 6px rgba(16, 16, 24, .06);
+  --btn: #17171A; --on-btn: #FFFFFF; --lane: #ECECEF; --wave: #84848D;
   --silence: #5E7394; --filler: #A07A00; --repeat: #C2185B;
-  --silence-soft: rgba(94, 115, 148, .16); --filler-soft: rgba(160, 122, 0, .14); --repeat-soft: rgba(194, 24, 91, .10);
+  --silence-soft: rgba(94, 115, 148, .14); --filler-soft: rgba(160, 122, 0, .14); --repeat-soft: rgba(194, 24, 91, .10);
   color-scheme: light;
 }
 @media (prefers-color-scheme: dark) {
   :root {
     --bg-0: #0F0F11; --bg-1: #17171A; --bg-2: #1E1E22; --line: #28282D; --line-2: #37373E;
     --fg-1: #EDEDF0; --fg-2: #ABABB4; --fg-3: #8F8F99; --fg-4: #56565E;
-    --btn: #EDEDF0; --on-btn: #111113; --lane: #1B1B1F; --wave: #6A6A74;
+    --bg-3: #27272C; --shadow: 0 14px 36px rgba(0, 0, 0, .5), 0 2px 6px rgba(0, 0, 0, .3);
+    --btn: #EDEDF0; --on-btn: #111113; --lane: #1E1E22; --wave: #6A6A74;
     --silence: #8A9CB8; --filler: #E6C44F; --repeat: #E4649F;
-    --silence-soft: rgba(138, 156, 184, .18); --filler-soft: rgba(230, 196, 79, .16); --repeat-soft: rgba(228, 100, 159, .16);
+    --silence-soft: rgba(138, 156, 184, .16); --filler-soft: rgba(230, 196, 79, .16); --repeat-soft: rgba(228, 100, 159, .16);
     color-scheme: dark;
   }
 }
@@ -52,98 +54,237 @@ a { color: inherit; text-underline-offset: 3px; }
 h1, h2, h3 { font-weight: 600; margin: 0; }
 p { margin: 0; }
 .wrap { max-width: 1152px; margin: 0 auto; padding: 0 24px; }
-.text { max-width: 640px; }
-.muted { color: var(--fg-3); }
 .num { font-variant-numeric: tabular-nums; }
+:focus-visible { outline: 2px solid var(--fg-1); outline-offset: 3px; }
 
 /* 위 막대 */
 .top { display: flex; align-items: center; justify-content: space-between; height: 64px; }
 .brand { display: flex; align-items: center; gap: 10px; font-weight: 600; text-decoration: none; }
 .brand img { width: 28px; height: 28px; border-radius: 7px; }
-.top a.small { font-size: 14px; color: var(--fg-2); }
+.pill { font-size: 14px; font-weight: 600; text-decoration: none; padding: 7px 14px; border-radius: 999px; border: 1px solid var(--line-2); }
 
-/* 히어로 */
-.hero { padding: 96px 0 0; }
-.hero h1 { font-size: 56px; line-height: 1.2; letter-spacing: -.025em; }
-.hero .sub { margin-top: 20px; font-size: 20px; line-height: 1.6; color: var(--fg-2); max-width: 34em; }
-.get { margin-top: 36px; display: flex; flex-wrap: wrap; align-items: center; gap: 12px 20px; }
-.btn {
-  display: inline-flex; align-items: center; justify-content: center; height: 56px; padding: 0 28px;
-  border-radius: 12px; background: var(--btn); color: var(--on-btn); font-weight: 600; font-size: 17px; text-decoration: none;
-}
+/* ① 공감 */
+.hero { padding: 168px 0 136px; }
+.eyebrow { font-size: 15px; color: var(--fg-3); }
+.hero h1 { margin-top: 20px; font-size: 60px; line-height: 1.22; letter-spacing: -.03em; }
+.hero .sub { margin-top: 28px; font-size: 21px; line-height: 1.65; color: var(--fg-2); max-width: 30em; }
+.more { display: inline-block; margin-top: 48px; font-size: 17px; font-weight: 600; text-decoration: none; border-bottom: 1px solid currentColor; padding-bottom: 2px; }
+
+/* 섹션 공통 */
+section { padding-top: 160px; }
+section h2 { font-size: 40px; line-height: 1.3; letter-spacing: -.025em; }
+section .lead { margin-top: 18px; font-size: 19px; color: var(--fg-2); max-width: 36em; }
+.body { margin-top: 48px; }
+
+/* ② 찍은 그대로 → 다듬은 뒤. 샘플 자막을 줄끼리 맞춰 놓는다 */
+/* 잘린 말. 왼쪽(찍은 그대로)에서는 눌러서 되살리는 단추, 오른쪽(다듬은 뒤)에서는 잘렸으면 사라지고 되살렸으면 남는다 */
+.x { font: inherit; color: var(--fg-1); border: 0; border-radius: 4px; padding: 0 .15em; margin: 0; background: none;
+  text-decoration: line-through; text-decoration-thickness: 2px; }
+button.x { cursor: pointer; }
+button.x:hover { box-shadow: 0 0 0 1.5px var(--fg-4); }
+.x.f { background: var(--filler-soft); text-decoration-color: var(--filler); }
+.x.r { background: var(--repeat-soft); text-decoration-color: var(--repeat); }
+.x.off { text-decoration: none; background: var(--bg-3); color: var(--fg-1); }
+.sil { display: inline-block; font-size: 14px; padding: 2px 10px; border-radius: 999px; background: var(--silence-soft); color: var(--fg-2); text-decoration: none; }
+.sil::before { content: ''; display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--silence); margin-right: 7px; vertical-align: 1px; }
+.sil.off { background: transparent; box-shadow: inset 0 0 0 1px var(--line-2); }
+.hint { display: inline-flex; align-items: center; gap: 8px; margin-top: 18px; font-size: 15px; font-weight: 600; color: var(--fg-1); }
+.hint::before { content: ''; width: 8px; height: 8px; border-radius: 50%; background: var(--fg-1); animation: blink 1.6s ease-in-out infinite; }
+@keyframes blink { 50% { opacity: .2; } }
+.lane { display: flex; height: 40px; border-radius: 8px; overflow: hidden; background: var(--lane); }
+.ls { flex: var(--d) 1 0; min-width: 0; background-repeat: repeat-x; background-position: center; background-size: auto 100%; transition: flex-grow .35s ease; }
+.ls.s { background: var(--silence); } .ls.f { background: var(--filler); } .ls.r { background: var(--repeat); }
+.ls.kept { background-color: var(--bg-3); }
+.lane { transition: width .35s ease; }
+.cmp-sum { margin-top: 20px; display: flex; flex-wrap: wrap; gap: 6px 22px; font-size: 15px; color: var(--fg-2); }
+.dot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-right: 7px; vertical-align: 1px; }
+.note { margin-top: 10px; font-size: 14px; color: var(--fg-3); }
+
+
+/* 재생 — 파랑은 "지금"만 뜻한다(앱과 같다): 재생헤드와 지금 들리는 줄 */
+:root { --accent: #2360E8; --accent-soft: rgba(35, 96, 232, .09); }
+@media (prefers-color-scheme: dark) { :root { --accent: #4A7FF5; --accent-soft: rgba(64, 120, 255, .15); } }
+.player { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 16px; padding: 16px 28px; border-bottom: 1px solid var(--line); }
+.play { width: 44px; height: 44px; border-radius: 50%; border: 0; background: var(--btn); color: var(--on-btn); display: inline-flex; align-items: center; justify-content: center; cursor: pointer; flex: none; }
+.play svg { width: 16px; height: 16px; fill: currentColor; }
+.ptime { color: var(--fg-2); font-size: 15px; }
+.ph { position: absolute; top: 0; bottom: 0; width: 2px; margin-left: -1px; background: var(--accent); pointer-events: none; z-index: 1; }
+.ph[hidden] { display: none; }
+
+/* 샘플 영상 — 비교 화면 맨 위 */
+/* 영상이 들어오기 전에 비는 자리. 영상은 칸을 꽉 채운다 */
+.stage { background: #141210; display: flex; justify-content: center; border-bottom: 1px solid var(--line); }
+.vbox { position: relative; width: 100%; max-width: 760px; aspect-ratio: 16 / 9; overflow: hidden; }
+.vbox video { display: block; width: 100%; height: 100%; }
+.sl-row.now { background: var(--accent-soft); }
+.sl-row .lis { width: 30px; height: 30px; border-radius: 50%; border: 1px solid var(--line-2); background: none; color: var(--fg-2); display: inline-flex; align-items: center; justify-content: center; cursor: pointer; }
+.sl-row .lis svg, .ct .lis svg { width: 10px; height: 10px; fill: currentColor; margin-left: 2px; }
+.ct .lis { width: 28px; height: 28px; border-radius: 50%; border: 1px solid var(--line-2); background: none; color: var(--fg-2); display: inline-flex; align-items: center; justify-content: center; cursor: pointer; }
+.ct tr.now td { background: var(--accent-soft); }
+.mini { position: fixed; left: 50%; bottom: 16px; transform: translateX(-50%); z-index: 20; display: flex; align-items: center; gap: 12px;
+  padding: 8px 18px 8px 8px; border-radius: 999px; background: var(--bg-1); border: 1px solid var(--line-2); box-shadow: var(--shadow); max-width: calc(100vw - 32px); }
+.mini[hidden] { display: none; }
+.mini .play { width: 40px; height: 40px; }
+.mini-cap { font-size: 14px; color: var(--fg-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 300px; }
+
+/* 받기 */
+.cta { margin-top: 72px; padding: 40px; border-radius: 20px; background: var(--bg-1); border: 1px solid var(--line);
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 24px; }
+.cta h3 { font-size: 24px; line-height: 1.4; }
+.cta p { margin-top: 6px; font-size: 15px; color: var(--fg-3); }
+.get { display: flex; flex-direction: column; align-items: flex-end; gap: 10px; }
+.btn { display: inline-flex; align-items: center; justify-content: center; height: 56px; padding: 0 28px;
+  border-radius: 12px; background: var(--btn); color: var(--on-btn); font-weight: 600; font-size: 17px; text-decoration: none; }
 .btn:hover { opacity: .9; }
-.btn:focus-visible, a:focus-visible, summary:focus-visible, button:focus-visible { outline: 2px solid var(--fg-1); outline-offset: 3px; }
-.other { font-size: 14px; color: var(--fg-3); }
-.other a { color: var(--fg-2); }
-.facts { margin-top: 14px; font-size: 14px; color: var(--fg-3); }
-.after {
-  margin-top: 16px; max-width: 640px; padding: 14px 18px; border-radius: 12px; background: var(--bg-1);
-  border: 1px solid var(--line); font-size: 15px;
+.pick { display: flex; gap: 8px; }
+.os-wrap { position: relative; }
+.os {
+  height: 56px; min-width: 196px; padding: 0 44px 0 18px; border-radius: 12px; border: 1px solid var(--line-2);
+  background-color: var(--bg-1); color: var(--fg-1); font: inherit; font-size: 16px; text-align: left; cursor: pointer;
+  /* 아래 꺾쇠. 테마 색을 따라가도록 그림 대신 그라디언트 둘로 그린다 */
+  background-image: linear-gradient(45deg, transparent 50%, var(--fg-3) 50%), linear-gradient(135deg, var(--fg-3) 50%, transparent 50%);
+  background-position: right 22px center, right 17px center; background-size: 5px 5px; background-repeat: no-repeat;
 }
+.os:hover, .os[aria-expanded="true"] { border-color: var(--fg-4); }
+/* 펼친 목록은 앱의 떠 있는 판(.float)과 같은 얼굴. 고른 줄은 회색으로 띄운다(DESIGN.md 원칙 1) */
+.os-list {
+  position: absolute; z-index: 10; top: calc(100% + 6px); left: 0; min-width: 100%; width: max-content;
+  margin: 0; padding: 6px; list-style: none; background: var(--bg-1); border: 1px solid var(--line-2); border-radius: 14px; box-shadow: var(--shadow);
+}
+.os-list[hidden] { display: none; }
+.os-list li { display: flex; align-items: center; gap: 6px; padding: 10px 12px; border-radius: 9px; font-size: 15px; cursor: pointer; white-space: nowrap; }
+.os-list li span { color: var(--fg-3); }
+.os-list li.on { background: var(--bg-2); }
+.os-list li[aria-selected="true"] { background: var(--bg-3); }
+.os-list li[aria-selected="true"]::after { content: '✓'; margin-left: auto; padding-left: 20px; color: var(--fg-2); }
+.other { font-size: 14px; color: var(--fg-3); }
+.other[hidden] { display: none; }
+.after { flex-basis: 100%; padding: 14px 18px; border-radius: 12px; background: var(--bg-2); font-size: 15px; }
 .after[hidden] { display: none; }
 
-/* 접히는 타임라인 — 샘플의 실제 컷 자리다 */
-.demo { margin-top: 72px; padding: 32px; border-radius: 20px; background: var(--bg-1); border: 1px solid var(--line); }
-.demo-head { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
-.clock { font-size: 72px; line-height: 1; font-weight: 600; letter-spacing: -.02em; }
-.clock .from { color: var(--fg-4); font-size: 32px; margin-right: 12px; font-weight: 400; }
-.replay { font: inherit; font-size: 14px; color: var(--fg-2); background: none; border: 1px solid var(--line-2); border-radius: 999px; padding: 6px 14px; cursor: pointer; }
-.lanes { margin-top: 28px; display: grid; grid-template-columns: 56px 1fr; gap: 12px 16px; align-items: center; }
-.lanes > span { font-size: 14px; color: var(--fg-3); }
-.lane { display: flex; height: 56px; border-radius: 10px; overflow: hidden; background: var(--lane); width: 100%;
-  transition: width .8s cubic-bezier(.2, .8, .2, 1); }
-.seg { flex: var(--d) 1 0; min-width: 0; transition: flex-grow .8s cubic-bezier(.2, .8, .2, 1); }
-.seg.talk { background-repeat: repeat-x; background-position: center; }
-.seg.cut { background: transparent; transition: flex-grow .8s cubic-bezier(.2, .8, .2, 1), background-color .3s; }
-.lane.marked .seg.s { background: var(--silence); }
-.lane.marked .seg.f { background: var(--filler); }
-.lane.marked .seg.r { background: var(--repeat); }
-.lane.folded .seg.cut { flex-grow: 0; }
-.lane.folded { width: var(--kept); }
-.legend { margin-top: 16px; display: flex; flex-wrap: wrap; gap: 6px 20px; font-size: 14px; color: var(--fg-2); }
-.dot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-right: 6px; vertical-align: 1px; }
-.note { margin-top: 16px; font-size: 14px; color: var(--fg-3); }
-
-/* 섹션 */
-section { padding-top: 144px; }
-section h2 { font-size: 36px; line-height: 1.3; letter-spacing: -.02em; }
-section .lead { margin-top: 16px; font-size: 19px; color: var(--fg-2); }
-.body { margin-top: 40px; }
-
-/* 무엇을 자르나 — 실제 자막 줄을 인용하고 잘릴 말을 접는다 */
-.cuts { display: grid; gap: 0; border-top: 1px solid var(--line); }
-.cutrow { display: grid; grid-template-columns: 160px 1fr; gap: 24px; padding: 28px 0; border-bottom: 1px solid var(--line); align-items: baseline; }
-.tag { font-size: 15px; font-weight: 600; }
-.quote { font-size: 24px; line-height: 1.5; }
-.x { border-radius: 6px; text-decoration: line-through; text-decoration-thickness: 2px; margin-right: .25em; color: var(--fg-3); }
-.x.s { background: var(--silence-soft); text-decoration: none; padding: .1em .6em; font-size: .7em; vertical-align: .15em; white-space: nowrap; }
-.x.f { background: var(--filler-soft); text-decoration-color: var(--filler); padding: 0 .15em; }
-.x.r { background: var(--repeat-soft); text-decoration-color: var(--repeat); padding: 0 .15em; }
-
-/* 화면 */
-.shot { display: block; width: 100%; height: auto; border-radius: 16px; border: 1px solid var(--line); }
-.split { display: grid; grid-template-columns: 1fr 1.25fr; gap: 56px; align-items: center; }
-ul.ticks { margin: 24px 0 0; padding: 0; list-style: none; color: var(--fg-2); }
+/* ③ 고르는 건 편집자 */
+ul.ticks { margin: 28px 0 0; padding: 0; list-style: none; color: var(--fg-2); }
 ul.ticks li { padding: 6px 0; }
 ul.ticks li::before { content: '—'; color: var(--fg-4); margin-right: 10px; }
+kbd { font: 13px ui-monospace, 'Cascadia Mono', Consolas, Menlo, monospace; padding: 1px 6px; border: 1px solid var(--line-2); border-radius: 5px; background: var(--bg-1); }
 
-/* 프리미어로 */
+.feats { margin-top: 32px; display: grid; gap: 22px; }
+.feats h3, .minis h3 { font-size: 17px; margin-bottom: 4px; }
+.feats p, .minis p { font-size: 15px; color: var(--fg-2); }
+.cards { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+.card { background: var(--bg-1); border: 1px solid var(--line); border-radius: 20px; overflow: hidden; display: flex; flex-direction: column; }
+.card-text { padding: 24px 28px 28px; }
+.card-text h3 { font-size: 19px; margin-bottom: 8px; }
+.card-text p { font-size: 15px; color: var(--fg-2); }
+.minis { margin-top: 40px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px; }
+
+
+/* 체험판 한 덩어리 — 왼쪽 영상 · 오른쪽 탭. 오른쪽 칸은 왼쪽 높이에 맞추고 안에서 스크롤한다 */
+.demo { display: grid; grid-template-columns: minmax(0, 1.12fr) minmax(0, 1fr); background: var(--bg-1); border: 1px solid var(--line); border-radius: 20px; overflow: hidden; }
+.demo-left { border-right: 1px solid var(--line); }
+.demo-right { position: relative; min-width: 0; }
+.rcol { position: absolute; inset: 0; display: flex; flex-direction: column; }
+.tabs { display: flex; gap: 2px; padding: 10px 12px; border-bottom: 1px solid var(--line); overflow-x: auto; flex: none; }
+.tabs button { flex: none; height: 34px; padding: 0 12px; border: 0; border-radius: 8px; background: none; font: inherit; font-size: 14px; font-weight: 600; color: var(--fg-3); cursor: pointer; }
+.tabs button:hover { color: var(--fg-1); }
+.tabs button[aria-selected="true"] { background: var(--bg-3); color: var(--fg-1); }
+.panel { flex: 1; min-height: 0; overflow: auto; position: relative; }
+.panel[hidden] { display: none; }
+.ptip { padding: 14px 22px 6px; font-size: 14px; color: var(--fg-3); }
+.an-row { padding: 9px 22px; cursor: pointer; line-height: 1.65; font-size: 15px; }
+.an-row:hover:not(.now) { background: var(--bg-2); }
+.an-row.now { background: var(--accent-soft); }
+.an-row .tm { display: block; font-size: 12px; color: var(--fg-3); }
+.an-row.gap { padding-top: 6px; padding-bottom: 6px; }
+.cap-box { position: absolute; left: 6%; right: 6%; display: flex; justify-content: center; }
+.lanes2 { padding: 4px 22px 20px; }
+.lrow { display: flex; justify-content: space-between; align-items: baseline; margin: 12px 0 6px; font-size: 13px; color: var(--fg-3); }
+.lrow b { font-size: 20px; font-weight: 600; color: var(--fg-1); letter-spacing: -.01em; }
+/* 재생헤드(.ph)가 막대 안에 서도록 — 없으면 페이지 전체 높이로 그려진다 */
+.lanes2 .lane { height: 30px; position: relative; cursor: pointer; }
+.lanes2 .cmp-sum { margin-top: 16px; font-size: 13px; gap: 4px 16px; }
+.small { font-size: 13px; }
+.muted { color: var(--fg-3); }
+.try { margin-top: 28px; height: 44px; padding: 0 18px; border-radius: 10px; border: 1px solid var(--line-2); background: var(--bg-1); font: inherit; font-size: 15px; font-weight: 600; color: var(--fg-1); cursor: pointer; }
+.try:hover { border-color: var(--fg-4); }
+.feats2 { grid-template-columns: 1fr 1fr; gap: 28px 48px; max-width: 900px; }
+
+/* 체험판 — 앱의 부품(web/ps.css 의 .seg · .pill · .ct-tgl · .sl-tag)을 이 페이지 크기로 옮긴 것.
+   이름을 바꾼 까닭: 이 페이지에서 .seg · .pill 은 이미 다른 뜻으로 쓴다. */
+:root { --mono: ui-monospace, 'SF Mono', 'Cascadia Mono', Consolas, Menlo, monospace; --line-strong: #8A8A94;
+  --sel: #FFFFFF; --sel-ring: 0 1px 2px rgba(16, 16, 24, .10), 0 0 0 1px #D3D3D9; }
+@media (prefers-color-scheme: dark) { :root { --line-strong: #66666F;
+  --sel: #3E3E46; --sel-ring: 0 0 0 1px rgba(255, 255, 255, .06), 0 1px 2px rgba(0, 0, 0, .3); } }
+.mono { font-family: var(--mono); }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+.m-tools { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; padding: 14px 22px; }
+.m-foot { padding: 14px 22px; border-top: 1px solid var(--line); color: var(--fg-2); font-size: 14px; }
+.m-foot b { color: var(--fg-1); font-weight: 600; }
+.sg { display: inline-flex; flex-wrap: wrap; gap: 2px; padding: 3px; background: var(--bg-2); border: 1px solid var(--line); border-radius: 10px; }
+.sg button { height: 30px; padding: 0 12px; border: 0; border-radius: 7px; background: none; font: inherit; font-size: 13px; font-weight: 600; color: var(--fg-3); cursor: pointer; white-space: nowrap; }
+.sg button:hover:not([aria-pressed="true"]) { color: var(--fg-1); }
+.sg button[aria-pressed="true"] { background: var(--sel); color: var(--fg-1); box-shadow: var(--sel-ring); }
+.tg { display: inline-flex; align-items: center; gap: 7px; height: 36px; padding: 0 14px 0 10px; border-radius: 999px; border: 1px solid var(--line-2); background: none; font: inherit; font-size: 13px; font-weight: 600; color: var(--fg-2); cursor: pointer; }
+.tg i { width: 14px; height: 14px; border-radius: 50%; border: 1.5px solid var(--line-strong); display: inline-flex; align-items: center; justify-content: center; }
+.tg[aria-pressed="true"] { background: var(--bg-3); border-color: var(--line-strong); color: var(--fg-1); }
+.tg[aria-pressed="true"] i { background: var(--fg-1); border-color: var(--fg-1); }
+.tg[aria-pressed="true"] i::after { content: ''; width: 5px; height: 5px; border-radius: 50%; background: var(--bg-1); }
+.sb { height: 36px; padding: 0 14px; border-radius: 9px; border: 0; background: var(--bg-3); font: inherit; font-size: 13px; font-weight: 600; color: var(--fg-1); cursor: pointer; }
+.sb:disabled { opacity: .4; cursor: default; }
+
+/* 컷 목록 */
+.ct { width: 100%; border-collapse: collapse; }
+.ct th { text-align: left; font-size: 13px; font-weight: 600; color: var(--fg-3); padding: 12px 8px; border-bottom: 1px solid var(--line); }
+.ct td { padding: 10px 8px; border-bottom: 1px solid var(--line); white-space: nowrap; }
+.ct tr > :first-child { padding-left: 22px; width: 48px; }
+.ct tbody tr:last-child td { border-bottom: 0; }
+.ct tr.off td:not(:first-child) { color: var(--fg-4); }
+.ct .why { color: var(--fg-3); }
+.ct .mono { font-size: 14px; }
+.ct-tgl { position: relative; display: inline-flex; align-items: center; justify-content: center; width: 20px; height: 20px; padding: 0; border-radius: 6px; border: 1.5px solid var(--line-strong); background: none; color: var(--bg-1); cursor: pointer; }
+.ct-tgl::after { content: ''; position: absolute; inset: -7px; }
+.ct-tgl svg { width: 12px; height: 12px; visibility: hidden; }
+.ct-tgl[aria-pressed="true"] { background: var(--fg-1); border-color: var(--fg-1); }
+.ct-tgl[aria-pressed="true"] svg { visibility: visible; }
+
+/* 자막 줄 */
+.sl-rows { padding: 8px 0; }
+.sl-row { display: grid; grid-template-columns: 104px 1fr auto; align-items: center; gap: 12px; padding: 6px 22px; }
+[data-cues] .sl-row { grid-template-columns: 30px 104px 1fr auto; }
+.sl-row .tm { color: var(--fg-3); font-size: 13px; }
+.sl-row.cut input { color: var(--fg-4); text-decoration: line-through; }
+.sl-row input { width: 100%; font: inherit; color: var(--fg-1); background: transparent; border: 1px solid transparent; border-radius: 8px; padding: 7px 10px; margin-left: -11px; }
+.sl-row input:hover { border-color: var(--line-2); }
+.sl-row input:focus { outline: none; border-color: var(--fg-3); background: var(--bg-2); }
+.sl-row .txt { padding: 7px 0; }
+.tags { display: inline-flex; gap: 4px; }
+.tag { display: inline-flex; align-items: center; gap: 4px; height: 26px; padding: 0 9px; border-radius: 6px; border: 1px solid transparent; background: var(--bg-2); color: var(--fg-3); font: inherit; font-size: 12px; font-weight: 600; white-space: nowrap; }
+.tag.mono { font-family: var(--mono); font-weight: 400; }
+.tag.edit { background: var(--bg-3); color: var(--fg-1); }
+button.tag { cursor: pointer; }
+.tag.sfx { color: var(--fg-2); font-weight: 400; }
+.tag.sfx.sug { background: transparent; border: 1px dashed var(--line-strong); color: var(--fg-3); }
+.sfx-off .tag.sfx { display: none; }
+.tag.ping { animation: ping .35s ease; }
+@keyframes ping { 40% { transform: scale(1.18); } }
+
+/* 자막 모양 — 미리보기는 1080 높이 기준 값을 틀 높이에 맞춰 줄인다(앱의 captionCss 와 같은 셈) */
+.cap { text-align: center; word-break: keep-all; font-family: 'Pretendard', sans-serif; }
+
+/* ④ 프리미어 */
 .steps { display: grid; grid-template-columns: repeat(4, 1fr); gap: 32px; counter-reset: s; }
 .step { counter-increment: s; }
 .step::before { content: counter(s); display: block; font-size: 36px; line-height: 1; font-weight: 600; color: var(--fg-4); margin-bottom: 16px; }
 .step h3 { font-size: 17px; margin-bottom: 6px; }
 .step p { font-size: 15px; color: var(--fg-2); }
-kbd { font: 13px ui-monospace, 'Cascadia Mono', Consolas, Menlo, monospace; padding: 1px 6px; border: 1px solid var(--line-2); border-radius: 5px; background: var(--bg-1); }
 
-/* 정보 두 단 */
-dl.facts2 { margin: 0; display: grid; grid-template-columns: 200px 1fr; border-top: 1px solid var(--line); }
-dl.facts2 dt, dl.facts2 dd { margin: 0; padding: 20px 0; border-bottom: 1px solid var(--line); }
-dl.facts2 dt { font-weight: 600; padding-right: 24px; }
-dl.facts2 dd { color: var(--fg-2); }
-.fit { display: grid; grid-template-columns: 1fr 1fr; gap: 56px; }
-.fit h3 { font-size: 17px; margin-bottom: 8px; }
-
-/* 접힘 */
+/* 정보 */
+.fit { display: grid; grid-template-columns: 1fr 1fr; gap: 64px; }
+.fit h3 { font-size: 17px; }
+dl.facts { margin: 0; display: grid; grid-template-columns: 200px 1fr; border-top: 1px solid var(--line); }
+dl.facts dt, dl.facts dd { margin: 0; padding: 20px 0; border-bottom: 1px solid var(--line); }
+dl.facts dt { font-weight: 600; padding-right: 24px; }
+dl.facts dd { color: var(--fg-2); }
 details { border-bottom: 1px solid var(--line); }
 details:first-of-type { border-top: 1px solid var(--line); }
 summary { cursor: pointer; padding: 20px 0; font-weight: 600; list-style: none; display: flex; justify-content: space-between; gap: 16px; }
@@ -156,129 +297,248 @@ details li { margin-bottom: 6px; }
 code { font: 14px ui-monospace, 'Cascadia Mono', Consolas, Menlo, monospace; background: var(--bg-2); border: 1px solid var(--line); border-radius: 6px; padding: 2px 6px; overflow-wrap: anywhere; }
 pre { margin: 10px 0 0; white-space: pre-wrap; }
 
-.final { text-align: center; padding: 160px 0 0; }
-.final h2 { font-size: 40px; }
-.final .get { justify-content: center; }
+.final { text-align: center; padding-top: 176px; }
+.final h2 { font-size: 40px; line-height: 1.3; letter-spacing: -.025em; }
+.final p { margin-top: 14px; color: var(--fg-3); }
+.final .get { align-items: center; margin-top: 36px; }
 footer { margin-top: 144px; padding: 28px 0 48px; border-top: 1px solid var(--line); font-size: 13px; color: var(--fg-3); }
 footer p + p { margin-top: 6px; }
 
 @media (max-width: 860px) {
-  .split, .fit { grid-template-columns: 1fr; gap: 32px; }
+  .demo { grid-template-columns: 1fr; }
+  .demo-left { border-right: 0; border-bottom: 1px solid var(--line); }
+  .rcol { position: static; height: 64vh; }
+  .feats2 { grid-template-columns: 1fr; }
+  .split, .split.flip, .fit, .cards, .minis { grid-template-columns: 1fr; gap: 32px; }
+  .split.flip > :first-child { order: 2; }
   .steps { grid-template-columns: 1fr 1fr; }
+  .cta { flex-direction: column; align-items: stretch; }
+  .get { align-items: stretch; }
 }
 @media (max-width: 600px) {
   body { font-size: 16px; }
   .wrap { padding: 0 16px; }
-  .hero { padding-top: 32px; }
+  .hero { padding: 88px 0 72px; }
   .hero h1 { font-size: 34px; }
-  .hero .sub { font-size: 17px; }
-  .btn { width: 100%; }
-  .demo { margin-top: 48px; padding: 20px; }
-  .clock { font-size: 48px; }
-  .clock .from { font-size: 22px; }
-  .lane { height: 36px; }
-  .lanes { grid-template-columns: 36px 1fr; gap: 10px 10px; }
-  section { padding-top: 96px; }
-  section h2 { font-size: 26px; }
+  .hero .sub { font-size: 17px; margin-top: 20px; }
+  .more { margin-top: 36px; }
+  section { padding-top: 104px; }
+  section h2, .final h2 { font-size: 27px; }
   section .lead { font-size: 17px; }
-  .cutrow { grid-template-columns: 1fr; gap: 6px; padding: 20px 0; }
-  .quote { font-size: 19px; }
+  /* 좁으면 한 줄 안에서 위가 찍은 그대로, 아래가 다듬은 뒤 */
+  .cmp-row { grid-template-columns: 1fr; }
+  .cmp-row > div { padding: 0 18px; }
+  .cmp-row > div + div { border-left: 0; }
+  .cmp-head { grid-template-columns: 1fr 1fr; }
+  .cmp-head > div { padding: 18px; }
+  .cmp-head > div + div { border-left: 1px solid var(--line); }
+  .cmp-head .len { font-size: 24px; }
+  .cmp-lines { padding: 6px 0; }
+  .cmp-lines .cmp-row { padding: 10px 0; border-bottom: 1px solid var(--line); }
+  .cmp-lines .cmp-row:last-child { border-bottom: 0; }
+  .cmp-lines .a { font-size: 14px; }
+  .cmp-lines .b::before { content: '→ '; color: var(--fg-4); }
+  .cmp-lines .gone .b { display: none; }
+  .cmp-bars > div { padding: 14px 18px; }
+  .player { padding: 14px 18px; }
+  .cmp-bars > div + div { padding-top: 0; }
+  .lane { height: 28px; }
+  .ct .why { display: none; }
+  .sl-row { grid-template-columns: 1fr auto; gap: 2px 8px; padding: 8px 16px; }
+  .mini-cap { display: none; }
+  .sl-row .tm { grid-column: 1 / -1; }
+  [data-cues] .sl-row { grid-template-columns: 30px 1fr auto; }
+  [data-cues] .sl-row .tm { grid-column: 2 / -1; grid-row: 1; }
+  .sl-row input { margin-left: -11px; }
+  .m-head, .m-tools, .m-foot { padding-left: 16px; padding-right: 16px; }
+  .ct tr > :first-child { padding-left: 16px; }
+  .cta { padding: 24px; margin-top: 48px; }
+  .btn { width: 100%; }
+  .pick { flex-direction: column; }
+  .os { width: 100%; }
+  .os-list { width: 100%; }
   .steps { grid-template-columns: 1fr; gap: 24px; }
-  dl.facts2 { grid-template-columns: 1fr; }
-  dl.facts2 dt { padding-bottom: 0; border-bottom: 0; }
-  dl.facts2 dd { padding-top: 4px; }
-  .final { padding-top: 96px; }
-  .final h2 { font-size: 28px; }
+  dl.facts { grid-template-columns: 1fr; }
+  dl.facts dt { padding-bottom: 0; border-bottom: 0; }
+  dl.facts dd { padding-top: 4px; }
+  .final { padding-top: 112px; }
   footer { margin-top: 96px; }
 }
-@media (prefers-reduced-motion: reduce) {
-  html { scroll-behavior: auto; }
-  .seg, .lane { transition: none !important; }
-}
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
 </style>
 </head>
 <body>
 <div class="wrap">
   <nav class="top">
     <a class="brand" href="#"><img src="icon.png" alt="">띵컷</a>
-    <a class="small" href="#get-final">받기</a>
+    <a class="pill" href="#get">무료로 받기</a>
   </nav>
 
   <header class="hero">
-    <h1>“어”, “음”, 말 멈춘 곳.<br>이제 손으로 안 잘라도 돼요</h1>
-    <p class="sub">촬영본을 넣으면 잘릴 곳과 자막이 나와요. 프리미어에서 가져오기 한 번이면 잘린 시퀀스와 자막이 들어와요.</p>
-    <div class="get" data-get>
-      <a class="btn" data-dl href="https://github.com/myoungji-kim/ddingcut/releases/latest/download/DDingCut-Setup.exe">Windows용 무료로 받기</a>
-      <span class="other">다른 컴퓨터:
-        <a href="https://github.com/myoungji-kim/ddingcut/releases/latest/download/DDingCut-Setup.exe">Windows</a> ·
-        <a href="https://github.com/myoungji-kim/ddingcut/releases/latest/download/DDingCut-mac-arm64.dmg">Mac (M칩)</a> ·
-        <a href="https://github.com/myoungji-kim/ddingcut/releases/latest/download/DDingCut-mac-x64.dmg">Mac (Intel)</a>
-      </span>
-    </div>
-    <p class="facts">프리미어 프로 쓰는 분용 · 무료, 가입 없음 · 영상은 내 컴퓨터 밖으로 나가지 않아요<span data-ver></span></p>
-    <p class="after" data-after hidden>받는 중이에요. 처음 켤 때 경고 창이 한 번 떠요 — <a href="#install">넘기는 법 보기</a></p>
+    <p class="eyebrow">컷편집에 지친 유튜브 편집자에게</p>
+    <h1>찍는 건 10분,<br>자르는 건 한나절</h1>
+    <p class="sub">숨 고른 2초, 말이 꼬인 한마디, 했던 말 또 하기.<br>이제 그건 띵컷이 듣고, 당신은 고르기만 하면 돼요.</p>
+    <a class="more" href="#listen">어떻게 달라지는지 볼까요 ↓</a>
   </header>
 
-  <figure class="demo" aria-label="샘플 72초 영상의 타임라인. 무음, 어·음, 반복 구간이 잘려 1분 12초가 46초가 된다." style="margin-left:0;margin-right:0">
-    <div class="demo-head">
-      <div class="clock num" aria-hidden="true"><span class="from">1:12 →</span><span data-clock>1:12</span></div>
-      <button class="replay" type="button" data-replay>다시 보기</button>
-    </div>
-    <div class="lanes" aria-hidden="true">
-      <span>원본</span><div class="lane" data-lane></div>
-      <span>띵컷</span><div class="lane" data-lane></div>
-    </div>
-    <div class="legend" aria-hidden="true">
-      <span><span class="dot" style="background:var(--silence)"></span>무음 6</span>
-      <span><span class="dot" style="background:var(--filler)"></span>어·음 3</span>
-      <span><span class="dot" style="background:var(--repeat)"></span>반복 2</span>
-    </div>
-    <figcaption class="note">앱에 든 72초 샘플 그대로예요. 실제 6분 45초 브이로그는 6분 15초가 됐어요 — 말이 빽빽한 영상일수록 덜 줄어요.</figcaption>
-  </figure>
+  <section id="listen" aria-labelledby="h-listen" style="padding-top:0">
+    <h2 id="h-listen">띵컷이 먼저 끝까지 들어 봤어요</h2>
+    <p class="lead">1분 15초짜리 촬영 원본이에요. 말이 멈춘 곳, 처음부터 다시 한 말을 찾아 잘라 두었어요. 오른쪽에서 무엇을 바꾸든 왼쪽 영상에 바로 나와요.</p>
+    <p class="hint">▶ 로 틀고 [원본 · 띵컷 후]를 바꿔 들어 보세요</p>
 
-  <section aria-labelledby="h-what">
-    <h2 id="h-what">세 가지를 찾아 잘라요</h2>
-    <p class="lead text">말소리를 듣고 글로 받아 적은 뒤에 찾아요. 그래서 소리 크기만으로는 못 찾는 “어”와 되풀이한 말도 잡아요.</p>
-    <div class="cuts body">
-      <div class="cutrow">
-        <span class="tag"><span class="dot" style="background:var(--silence)"></span>말이 멈춘 곳</span>
-        <p class="quote">제가 일주일 동안 들고 다녀봤는데요. <span class="x f">음</span><span class="x s">8.6초 정적</span>무게가 거의 느껴지지 않았습니다.</p>
+    <div class="demo body" id="demo">
+      <div class="demo-left">
+        <div class="stage" data-stage>
+          <div class="vbox">
+            <video data-media playsinline preload="auto" data-src="media/sample.mp4" aria-label="샘플 영상 — 띵컷 개발기 촬영 원본 1분 15초"></video>
+            <div class="cap-box" data-capbox-main><span class="cap" data-cap-main></span></div>
+          </div>
+        </div>
+        <div class="player">
+          <button type="button" class="play" data-play aria-label="재생"><svg viewBox="0 0 16 16" aria-hidden="true"><path data-icon d="M5 3.2v9.6L12.6 8z"/></svg></button>
+          <div class="sg" role="group" aria-label="무엇을 들을까요" data-mode><button type="button" aria-pressed="true" data-m="raw">원본</button><button type="button" aria-pressed="false" data-m="edit">띵컷 후</button></div>
+          <span class="mono num ptime" data-time>0:00 / 1:15</span>
+        </div>
+        <div class="lanes2">
+          <div class="lrow"><span>찍은 그대로</span><b class="num">1:15</b></div>
+          <div class="lane" data-lane="before"></div>
+          <div class="lrow"><span>띵컷이 다듬은 뒤</span><b class="num" data-len>0:26</b></div>
+          <div class="lane" data-lane="after"></div>
+          <div class="cmp-sum">
+            <span><span class="dot" style="background:var(--silence)"></span>말이 멈춘 곳</span>
+            <span><span class="dot" style="background:var(--repeat)"></span>같은 말 반복</span>
+            <span data-saved>7곳에서 49초를 덜어 냈어요</span>
+          </div>
+        </div>
       </div>
-      <div class="cutrow">
-        <span class="tag"><span class="dot" style="background:var(--filler)"></span>“어” · “음”</span>
-        <p class="quote"><span class="x f">어</span>보시면 아시겠지만 크기가 생각보다 훨씬 작습니다.</p>
+      <div class="demo-right">
+        <div class="rcol">
+          <div class="tabs" role="tablist" aria-label="체험판">
+            <button type="button" role="tab" aria-selected="true" data-tab="cuts">잘린 곳</button>
+            <button type="button" role="tab" aria-selected="false" tabindex="-1" data-tab="list">컷 목록</button>
+            <button type="button" role="tab" aria-selected="false" tabindex="-1" data-tab="sub">자막 고치기</button>
+            <button type="button" role="tab" aria-selected="false" tabindex="-1" data-tab="sfx">효과음</button>
+            <button type="button" role="tab" aria-selected="false" tabindex="-1" data-tab="style">자막 모양</button>
+          </div>
+          <div class="panel" role="tabpanel" aria-label="잘린 곳" data-panel="cuts">
+            <p class="ptip">잘린 말을 누르면 되살아나고, 줄을 누르면 거기서부터 들려요.</p>
+            <div class="ann" data-ann></div>
+          </div>
+          <div class="panel" role="tabpanel" aria-label="컷 목록" data-panel="list" hidden>
+            <div class="m-tools">
+              <div class="sg" role="group" aria-label="사유로 거르기" data-filter><button type="button" aria-pressed="true" data-f="">전체 7</button><button type="button" aria-pressed="false" data-f="s">무음 6</button><button type="button" aria-pressed="false" data-f="r">반복 1</button></div>
+              <button type="button" class="tg" aria-pressed="false" data-amb><i></i>애매한 것만 2</button>
+              <span class="muted num small" data-applied>11 / 11 적용</span>
+            </div>
+            <table class="ct">
+              <thead><tr><th><span class="sr">적용</span></th><th><span class="sr">들어 보기</span></th><th>시작</th><th>길이</th><th>사유</th><th class="why">근거</th></tr></thead>
+              <tbody data-rows></tbody>
+            </table>
+            <div class="m-foot num" data-sum></div>
+          </div>
+          <div class="panel" role="tabpanel" aria-label="자막 고치기" data-panel="sub" hidden>
+            <p class="ptip">‘이거의’를 ‘이거에’로 고쳐 보세요. 고친 글이 영상 자막에 바로 나와요. <span class="num" data-edits></span></p>
+            <div class="sl-rows" data-cues></div>
+          </div>
+          <div class="panel" role="tabpanel" aria-label="효과음" data-panel="sfx" hidden>
+            <div class="m-tools">
+              <button type="button" class="tg" aria-pressed="true" data-sfx-on><i></i>효과음</button>
+              <button type="button" class="sb" data-sfx-all>제안 5개 받기</button>
+            </div>
+            <p class="ptip" style="padding-top:0">점선은 제안이에요. 누르면 들어 보고 받아요. 받은 효과음은 재생하다 그 줄에서 울려요.</p>
+            <div class="sl-rows" data-sfx-rows></div>
+          </div>
+          <div class="panel" role="tabpanel" aria-label="자막 모양" data-panel="style" hidden>
+            <p class="ptip">템플릿을 누르면 왼쪽 영상의 자막이 바뀌어요.</p>
+            <div class="m-tools">
+              <div class="sg" role="group" aria-label="자막 템플릿" data-tpl><button type="button" aria-pressed="true" data-t="outline">기본</button><button type="button" aria-pressed="false" data-t="yellow">노랑</button><button type="button" aria-pressed="false" data-t="effect">효과</button><button type="button" aria-pressed="false" data-t="box">박스</button><button type="button" aria-pressed="false" data-t="minimal">미니멀</button><button type="button" aria-pressed="false" data-t="top">위</button></div>
+            </div>
+            <p class="ptip" style="padding-top:0" data-tpl-note></p>
+            <p class="ptip" style="padding-top:0">말 · 강조 · 효과, 트랙마다 모양을 정해 섞어 쓰고, 내 프리미어 자막 템플릿(.mogrt)도 불러와요.</p>
+          </div>
+        </div>
       </div>
-      <div class="cutrow">
-        <span class="tag"><span class="dot" style="background:var(--repeat)"></span>같은 말 반복</span>
-        <p class="quote"><span class="x r">그래서 이제</span>그래서 이제 휴대성이 정말 좋아요.</p>
+    </div>
+    <p class="note">소리는 띵컷 개발기 원본 촬영본 1분 15초를 그대로 썼고(얼굴 대신 그림을 깔았어요), 컷은 이 소리를 띵컷에 넣어 나온 그대로예요. 23분 원본 전체는 8분 39초가 됐어요.</p>
+
+    <div class="cta" id="get">
+      <div>
+        <h3>다음 촬영본은 띵컷에 먼저 넣어 보세요</h3>
+        <p>무료 · 가입 없음 · 영상은 내 컴퓨터 밖으로 나가지 않아요<span data-ver></span></p>
       </div>
+      <div class="get">
+        <div class="pick">
+          <div class="os-wrap" data-pick>
+            <button type="button" class="os" aria-haspopup="listbox" aria-expanded="false" aria-label="내 컴퓨터 고르기"><span data-label>Windows 10 · 11</span></button>
+            <ul class="os-list" role="listbox" aria-label="내 컴퓨터" tabindex="-1" hidden>
+              <li role="option" data-file="DDingCut-Setup.exe" aria-selected="true">Windows <span>10 · 11</span></li>
+              <li role="option" data-file="DDingCut-mac-arm64.dmg" aria-selected="false">Mac <span>M칩 (M1 이후)</span></li>
+              <li role="option" data-file="DDingCut-mac-x64.dmg" aria-selected="false">Mac <span>Intel</span></li>
+            </ul>
+          </div>
+          <a class="btn" data-dl href="https://github.com/myoungji-kim/ddingcut/releases/latest/download/DDingCut-Setup.exe">무료로 받기</a>
+        </div>
+        <a class="other" data-chip href="#mac-chip" hidden>내 Mac 이 M칩인지 확인하기</a>
+      </div>
+      <p class="after" data-after hidden>받는 중이에요. 처음 켤 때 경고 창이 한 번 떠요 — <a href="#install">넘기는 법 보기</a></p>
     </div>
   </section>
 
   <section aria-labelledby="h-edit">
-    <div class="split">
-      <div>
-        <h2 id="h-edit">자막은 글처럼 고쳐요</h2>
-        <p class="lead">잘린 결과를 들으면서, 틀린 자막은 그 자리에서 고쳐요. 살리고 싶은 컷은 눌러서 되살려요.</p>
-        <ul class="ticks">
-          <li>듣는 줄을 따라 커서가 내려가요</li>
-          <li>한꺼번에 찾아 바꾸기, 줄 합치기 · 나누기</li>
-          <li>덜 자르기 · 보통 · 더 자르기 한 번에 고르기</li>
-          <li>잘못 눌러도 <kbd>Ctrl</kbd>+<kbd>Z</kbd></li>
-        </ul>
+    <h2 id="h-edit">고르는 건 여전히 편집자 몫이에요</h2>
+    <p class="lead">띵컷은 잘릴 곳을 표시해 둘 뿐이에요. 남길지 자를지는 들어 보고 정하면 돼요.</p>
+    <div class="feats feats2 body">
+      <div><h3>살릴 건 살려요</h3><p>컷마다 들어 보고 <kbd>Enter</kbd> 로 켜고 꺼요. 일부러 둔 정적이면 그 컷만 끄면 돼요.</p></div>
+      <div><h3>잘릴 곳만 이어 듣기</h3><p>[이어 듣기]를 켜면 컷만 차례로 들려줘요. 애매한 것만 골라 먼저 볼 수도 있어요.</p></div>
+      <div><h3>놓친 곳은 직접</h3><p><kbd>I</kbd> · <kbd>O</kbd> 로 잡고 <kbd>Delete</kbd>. 컷 경계는 프레임 단위로 끌어 맞춰요.</p></div>
+      <div><h3>얼마나 자를지 한 번에</h3><p>[덜 자르기 · 보통 · 더 자르기] 중에 골라요. 숨 쉬는 틈까지 잘리면 덜, 말이 늘어지면 더.</p></div>
+    </div>
+    <button type="button" class="try" data-try="list">컷 목록 해 보기 ↑</button>
+  </section>
+
+  <section aria-labelledby="h-sub">
+    <h2 id="h-sub">틀린 자막은 글처럼 고쳐요</h2>
+    <p class="lead">자막은 내 컴퓨터에서 받아 적어요. 잘린 결과를 들으면서 틀린 곳은 그 자리에서 고치면 돼요.</p>
+    <ul class="ticks">
+      <li>듣는 줄을 따라 커서가 내려가요</li>
+      <li>한꺼번에 찾아 바꾸기, 끝 마침표 빼기</li>
+      <li>줄 합치기 · 나누기, 줄을 지우면 그 구간도 잘려요</li>
+      <li>잘못 눌러도 <kbd>Ctrl</kbd>+<kbd>Z</kbd></li>
+    </ul>
+    <button type="button" class="try" data-try="sub">자막 고치기 해 보기 ↑</button>
+  </section>
+
+  <section aria-labelledby="h-more">
+    <h2 id="h-more">자르고 나면, 꾸미는 것까지</h2>
+    <p class="lead">자막이 생기면 영상을 꾸밀 재료도 생겨요. 프리미어로 넘어가기 전에 한 화면에서 끝내요.</p>
+    <div class="cards body">
+      <div class="card">
+        <div class="card-text">
+          <h3>효과음</h3>
+          <p>자막 줄마다 어울리는 효과음을 골라 줘요. 제안을 받으면 프리미어 시퀀스의 소리 트랙에 함께 들어가고, 내 효과음 폴더로 바꿀 수도 있어요.</p>
+          <button type="button" class="try" data-try="sfx">효과음 해 보기 ↑</button>
+        </div>
       </div>
-      <picture>
-        <source srcset="img/sl-dark.webp" media="(prefers-color-scheme: dark)">
-        <img class="shot" src="img/sl-light.webp" width="1376" height="1312" loading="lazy" alt="띵컷의 자막 고치기 화면. 자막 줄마다 시각과 잘린 길이(-0.4초, -1.0초)가 붙어 있고, 한 줄은 고치는 중이다.">
-      </picture>
+      <div class="card">
+        <div class="card-text">
+          <h3>자막 모양</h3>
+          <p>말 · 강조 · 효과, 트랙마다 모양을 정해 섞어 쓰고, 내 프리미어 자막 템플릿(.mogrt)도 불러와 미리보기에서 바로 봐요.</p>
+          <button type="button" class="try" data-try="style">자막 모양 해 보기 ↑</button>
+        </div>
+      </div>
+    </div>
+    <div class="minis">
+      <div><h3>여러 클립을 한 번에</h3><p>파일 여러 개를 끌어다 놓으면 차례대로 이어 한 시퀀스로 만들어요. 클립끼리 소리 크기도 맞춰요.</p></div>
+      <div><h3>늘어지는 구간만 빠르게</h3><p>잡은 구간만 125 · 150 · 200%로. 목소리 높낮이는 그대로예요.</p></div>
+      <div><h3>작업이 날아가지 않아요</h3><p>창을 닫았다 다시 켜도 고친 그대로 열려요. 지난번 폴더에서 이어서 하면 돼요.</p></div>
     </div>
   </section>
 
   <section aria-labelledby="h-pr">
-    <h2 id="h-pr">프리미어로 그대로</h2>
-    <p class="lead text">컷은 시퀀스로, 자막은 캡션 트랙으로 들어와요. 프리미어에서 이어서 편집하면 돼요.</p>
+    <h2 id="h-pr">그다음은 늘 하던 대로, 프리미어에서</h2>
+    <p class="lead">컷은 시퀀스로, 자막은 캡션 트랙으로 들어와요. 새로 배울 것 없이 이어서 편집하면 돼요.</p>
     <div class="steps body">
-      <div class="step"><h3>저장</h3><p>[프리미어용 파일 저장]을 누르면 XML · 자막 SRT 를 한꺼번에 저장해요.</p></div>
+      <div class="step"><h3>저장</h3><p>[프리미어용 파일 저장]을 누르면 XML 과 자막 SRT 를 한꺼번에 저장해요. 효과음은 시퀀스 안에 함께 들어가요.</p></div>
       <div class="step"><h3>가져오기</h3><p>프리미어에서 <b>파일 → 가져오기</b>(<kbd>Ctrl</kbd>+<kbd>I</kbd>)로 .xml 을 열면 시퀀스가 생겨요.</p></div>
       <div class="step"><h3>열기</h3><p>그 시퀀스를 두 번 눌러 타임라인에 열어요.</p></div>
       <div class="step"><h3>자막 얹기</h3><p>.srt 도 가져온 뒤 타임라인 위로 끌어다 놓으면 캡션 트랙이 돼요.</p></div>
@@ -290,7 +550,7 @@ footer p + p { margin-top: 6px; }
     <div class="fit body">
       <div>
         <h3>잘 맞아요</h3>
-        <ul class="ticks" style="margin-top:0">
+        <ul class="ticks" style="margin-top:8px">
           <li>프리미어 프로로 편집해요</li>
           <li>혼자 말하는 영상 — 브이로그, 리뷰, 강의</li>
           <li>컷편집에 하루가 다 가요</li>
@@ -298,7 +558,7 @@ footer p + p { margin-top: 6px; }
       </div>
       <div>
         <h3>덜 맞아요</h3>
-        <ul class="ticks" style="margin-top:0">
+        <ul class="ticks" style="margin-top:8px">
           <li>프리미어를 안 써요 — 자막 파일(SRT)만 쓸 수 있어요</li>
           <li>말이 거의 없는 영상</li>
           <li>여럿이 겹쳐 말하는 영상 — 자막이 자주 틀려요</li>
@@ -309,7 +569,7 @@ footer p + p { margin-top: 6px; }
 
   <section aria-labelledby="h-local">
     <h2 id="h-local">내 컴퓨터 안에서 돌아요</h2>
-    <dl class="facts2 body">
+    <dl class="facts body">
       <dt>영상은 그대로</dt><dd>영상과 소리는 밖으로 나가지 않아요. 자막도 이 컴퓨터에서 만들어요. 가입도 없어요.</dd>
       <dt>처음 켜면</dt><dd>자막 만드는 도구를 뒤에서 받아요(약 2GB, NVIDIA 그래픽카드가 있으면 1.3GB 더). 그동안 [샘플로 둘러보기]나 컷 편집부터 해 보세요. 한 번 받으면 인터넷 없이 써요.</dd>
       <dt>필요한 것</dt><dd>Windows 10 · 11(64비트) 또는 macOS 12 이상. 빈 공간 5GB. 프리미어 프로.</dd>
@@ -344,7 +604,7 @@ footer p + p { margin-top: 6px; }
         <summary>경고가 뜨는데 안전한가요?</summary>
         <div><p>개인이 만든 프로그램이라 아직 코드 서명 인증서를 사지 않았어요. 그래서 운영체제가 “누가 만들었는지 모른다”고 알리는 것이고, 바이러스로 판정한 것이 아니에요. 띵컷은 이 페이지와 <a href="https://github.com/myoungji-kim/ddingcut/releases">GitHub 릴리스</a>에서만 받으세요.</p></div>
       </details>
-      <details>
+      <details id="mac-chip">
         <summary>내 Mac 이 M칩인지 Intel 인지 모르겠어요</summary>
         <div><p>화면 왼쪽 위 애플 메뉴 → <b>이 Mac에 관하여</b>. “칩”에 Apple M… 이 적혀 있으면 M칩, “프로세서”에 Intel 이 적혀 있으면 Intel 이에요.</p></div>
       </details>
@@ -359,23 +619,34 @@ footer p + p { margin-top: 6px; }
     </div>
   </section>
 
-  <div class="final" id="get-final">
-    <h2>오늘 찍은 영상으로 해 보세요</h2>
-    <div class="get" data-get>
-      <a class="btn" data-dl href="https://github.com/myoungji-kim/ddingcut/releases/latest/download/DDingCut-Setup.exe">Windows용 무료로 받기</a>
+  <div class="final">
+    <h2>오늘 찍은 영상, 자르기 전에<br>띵컷에 먼저 넣어 보세요</h2>
+    <p>안 되거나 이상하면 <a href="https://github.com/myoungji-kim/ddingcut/issues/new?template=bug.yml">알려 주세요</a>. 고쳐서 새 판으로 내요.</p>
+    <div class="get">
+      <div class="pick">
+        <div class="os-wrap" data-pick>
+          <button type="button" class="os" aria-haspopup="listbox" aria-expanded="false" aria-label="내 컴퓨터 고르기"><span data-label>Windows 10 · 11</span></button>
+          <ul class="os-list" role="listbox" aria-label="내 컴퓨터" tabindex="-1" hidden>
+            <li role="option" data-file="DDingCut-Setup.exe" aria-selected="true">Windows <span>10 · 11</span></li>
+            <li role="option" data-file="DDingCut-mac-arm64.dmg" aria-selected="false">Mac <span>M칩 (M1 이후)</span></li>
+            <li role="option" data-file="DDingCut-mac-x64.dmg" aria-selected="false">Mac <span>Intel</span></li>
+          </ul>
+        </div>
+        <a class="btn" data-dl href="https://github.com/myoungji-kim/ddingcut/releases/latest/download/DDingCut-Setup.exe">무료로 받기</a>
+      </div>
+      <a class="other" data-chip href="#mac-chip" hidden>내 Mac 이 M칩인지 확인하기</a>
     </div>
-    <p class="facts">안 되거나 이상하면 <a href="https://github.com/myoungji-kim/ddingcut/issues/new?template=bug.yml">알려 주세요</a> — 고쳐서 새 판으로 내요.</p>
   </div>
 
-  <section aria-label="전체 화면" style="padding-top:120px">
-    <picture>
-      <source srcset="img/full-dark.webp" media="(prefers-color-scheme: dark)">
-      <img class="shot" src="img/full-light.webp" width="2880" height="1800" loading="lazy" alt="띵컷 전체 화면. 왼쪽에 클립과 줄어든 길이, 가운데에 자막 목록, 오른쪽에 미리보기와 설정, 아래에 컷 구간이 색으로 표시된 타임라인.">
-    </picture>
-  </section>
+  <div class="mini" data-mini hidden>
+    <button type="button" class="play" data-play aria-label="재생"><svg viewBox="0 0 16 16" aria-hidden="true"><path data-icon d="M5 3.2v9.6L12.6 8z"/></svg></button>
+    <div class="sg" role="group" aria-label="무엇을 들을까요" data-mode><button type="button" aria-pressed="true" data-m="raw">원본</button><button type="button" aria-pressed="false" data-m="edit">띵컷 후</button></div>
+    <span class="mono num ptime" data-time>0:00 / 1:15</span>
+    <span class="mini-cap" data-mini-cap></span>
+  </div>
 
   <footer>
-    <p>자막은 OpenAI 의 Whisper large-v3-turbo 모델을 <a href="https://github.com/SYSTRAN/faster-whisper">faster-whisper</a> 로 돌려 만들어요(둘 다 MIT). 글꼴은 <a href="https://github.com/orioncactus/pretendard">Pretendard</a>(SIL OFL 1.1).</p>
+    <p>자막은 OpenAI 의 Whisper large-v3-turbo 모델을 <a href="https://github.com/SYSTRAN/faster-whisper">faster-whisper</a> 로 돌려 만들어요(둘 다 MIT). 글꼴은 <a href="https://github.com/orioncactus/pretendard">Pretendard</a>(SIL OFL 1.1). 샘플 소리는 띵컷을 만든 띵지로그의 개발기 원본 촬영본이에요.</p>
     <p>Premiere Pro 는 Adobe 의 상표이고, 띵컷은 Adobe 와 관계없는 개인 프로젝트예요. · <a href="https://github.com/myoungji-kim/ddingcut">GitHub</a></p>
   </footer>
 </div>
@@ -384,92 +655,474 @@ footer p + p { margin-top: 6px; }
 (function () {
   var REL = 'https://github.com/myoungji-kim/ddingcut/releases/latest/download/';
   var ua = navigator.userAgent, mac = /Macintosh|Mac OS X/.test(ua) && !/iPhone|iPad/.test(ua);
-  var os = mac ? 'mac' : 'win';
 
-  // 맥이면 대표 단추를 M칩판으로. 칩 종류는 브라우저가 알려 주지 않아 Intel 은 "다른 컴퓨터"에 둔다.
+  // 처음 고른 값만 들어온 컴퓨터를 따른다. 칩 종류는 브라우저가 알려 주지 않아 맥이면 M칩판을 먼저 고른다.
+  var pickers = document.querySelectorAll('[data-pick]'), current = '', rel = null, n = 0;
+  function file() { return current; }
+  function sync(v) {
+    current = v;
+    pickers.forEach(function (pk) {
+      pk.querySelectorAll('[role=option]').forEach(function (li) {
+        var on = li.dataset.file === v;
+        li.setAttribute('aria-selected', on);
+        if (on) pk.querySelector('[data-label]').textContent = li.textContent;
+      });
+    });
+    document.querySelectorAll('[data-dl]').forEach(function (a) { a.href = REL + v; });
+    document.querySelectorAll('[data-chip]').forEach(function (a) { a.hidden = !/mac/.test(v); });
+    showVer();
+  }
+
+  // 운영체제 기본 select 는 펼친 목록이 OS 모양이라 직접 그린다. 키보드: ↑↓ 옮기기, Enter · Space 고르기, Esc 닫기.
+  pickers.forEach(function (pk) {
+    var btn = pk.querySelector('.os'), list = pk.querySelector('[role=listbox]'), opts = [].slice.call(list.children), at = 0;
+    opts.forEach(function (li, k) { li.id = 'os-' + n + '-' + k; });
+    n++;
+    function mark(i) {
+      at = (i + opts.length) % opts.length;
+      opts.forEach(function (li, k) { li.classList.toggle('on', k === at); });
+      list.setAttribute('aria-activedescendant', opts[at].id);
+    }
+    function open() {
+      list.hidden = false; btn.setAttribute('aria-expanded', 'true');
+      mark(opts.findIndex(function (li) { return li.dataset.file === current; }));
+      list.focus();
+    }
+    function close(back) {
+      list.hidden = true; btn.setAttribute('aria-expanded', 'false');
+      if (back) btn.focus();
+    }
+    btn.addEventListener('click', function () { list.hidden ? open() : close(); });
+    btn.addEventListener('keydown', function (e) { if (e.key === 'ArrowDown' || e.key === 'ArrowUp') { e.preventDefault(); open(); } });
+    list.addEventListener('keydown', function (e) {
+      if (e.key === 'ArrowDown') { e.preventDefault(); mark(at + 1); }
+      else if (e.key === 'ArrowUp') { e.preventDefault(); mark(at - 1); }
+      else if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); sync(opts[at].dataset.file); close(true); }
+      else if (e.key === 'Escape') { close(true); }
+      else if (e.key === 'Tab') { close(); }
+    });
+    opts.forEach(function (li, k) {
+      li.addEventListener('mousemove', function () { mark(k); });
+      li.addEventListener('click', function () { sync(li.dataset.file); close(true); });
+    });
+    document.addEventListener('pointerdown', function (e) { if (!pk.contains(e.target)) close(); });
+  });
+
   document.querySelectorAll('[data-dl]').forEach(function (a) {
-    if (mac) { a.href = REL + 'DDingCut-mac-arm64.dmg'; a.textContent = 'Mac용 무료로 받기'; }
     a.addEventListener('click', function () {
-      var after = document.querySelector('[data-after]');
-      after.hidden = false;
-      var d = document.querySelector('details[data-os="' + os + '"]');
+      document.querySelector('[data-after]').hidden = false;
+      var d = document.querySelector('details[data-os="' + (/mac/.test(file()) ? 'mac' : 'win') + '"]');
       if (d) d.open = true;
     });
   });
 
   // 판 번호 · 날짜 · 크기. 릴리스가 아직 없거나 API 가 막히면 그냥 비워 둔다.
-  fetch('https://api.github.com/repos/myoungji-kim/ddingcut/releases/latest').then(function (r) { return r.ok ? r.json() : null; }).then(function (rel) {
+  function showVer() {
     if (!rel) return;
-    var name = mac ? 'DDingCut-mac-arm64.dmg' : 'DDingCut-Setup.exe';
-    var asset = (rel.assets || []).filter(function (x) { return x.name === name; })[0];
+    var asset = (rel.assets || []).filter(function (x) { return x.name === file(); })[0];
     var bits = [rel.tag_name, (rel.published_at || '').slice(0, 10)];
     if (asset) bits.push(Math.round(asset.size / 1048576) + 'MB');
     document.querySelector('[data-ver]').textContent = ' · ' + bits.filter(Boolean).join(' · ');
-  }).catch(function () {});
-
-  // 샘플 72초의 컷 자리(초). 앱의 샘플(src/web/sample.ts)을 넣었을 때 타임라인에 그려진 그대로다.
-  // ponytail: 손으로 옮겨 적었다. 샘플을 바꾸면 여기도 다시 잰다.
-  var TOTAL = 72, END = 46;
-  var CUTS = [[0, 2.8, 's'], [7.5, 1.0, 'f'], [19.1, 1.0, 'r'], [27.4, 8.6, 's'], [42.0, 0.9, 'f'],
-              [45.9, 2.3, 's'], [51.7, 0.9, 'r'], [58.1, 2.8, 's'], [66.7, 5.3, 's']];
-  var lanes = document.querySelectorAll('[data-lane]'), lane = lanes[1];
-  var t = 0, seed = 7, cut = 0;
-  function rnd() { seed = (seed * 9301 + 49297) % 233280; return seed / 233280; }
-  function wave(len) {
-    // 말 구간의 막대 파형. 정해진 씨앗이라 새로고침해도 모양이 같다.
-    var n = Math.max(2, Math.round(len * 3)), w = 6 * n, bars = '';
-    for (var i = 0; i < n; i++) { var h = 14 + Math.round(rnd() * 34); bars += '<rect x="' + (i * 6 + 1.5) + '" y="' + (32 - h / 2) + '" width="3" height="' + h + '" rx="1.5"/>'; }
-    return 'url("data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="' + w + '" height="64"><g fill="' + getComputedStyle(document.documentElement).getPropertyValue('--wave').trim() + '">' + bars + '</g></svg>') + '")';
   }
-  function add(dur, cls) {
-    var bg = cls === 'talk' ? wave(dur) : '';
-    lanes.forEach(function (l) {
+  fetch('https://api.github.com/repos/myoungji-kim/ddingcut/releases/latest').then(function (r) { return r.ok ? r.json() : null; })
+    .then(function (j) { rel = j; showVer(); }).catch(function () {});
+  sync(mac ? 'DDingCut-mac-arm64.dmg' : 'DDingCut-Setup.exe');
+
+  // 샘플(촬영 원본 1분 15초)의 컷. 이 페이지의 영상 소리(media/sample.mp4)와 원본 전체에서 잘라 온 자막을 앱에 넣었을 때 컷 목록에 나온 그대로다.
+  // ponytail: 손으로 옮겨 적었다. 소리를 다시 만들거나 탐지 기본값을 바꾸면 앱의 컷 목록을 보고 다시 옮긴다.
+  var TOTAL = 74.5;
+  var CUTS = [
+    { t: 0.000, d: 2.90, r: 'r', tc: '00;00;00;00', why: '무음 0.9초 + “그래서 제가 영상을 하나” ×2' },
+    { t: 8.367, d: 11.12, r: 's', tc: '00;00;08;11', why: '다시 시작 “그래서 20분짜리를 편집한다 하면은” + 6.3초 + 1.1초' },
+    { t: 21.733, d: 0.38, r: 's', tc: '00;00;21;22', why: '0.6초' },
+    { t: 25.700, d: 0.62, r: 's', tc: '00;00;25;21', why: '0.9초' },
+    { t: 27.500, d: 17.06, r: 's', tc: '00;00;27;15', why: '7.7초 + 다시 시작 “근데 제가 제일 답답했던 건 그 100분은” + 1.6초 + 1.0초' },
+    { t: 49.367, d: 6.25, r: 's', tc: '00;00;49;11', why: '반복 “지금 제가 말하는 것만 하더라도” ×2 + 3.2초 + 1.3초' },
+    { t: 61.033, d: 10.28, r: 's', tc: '00;01;01;01', why: '10.5초' },
+  ];
+  var NAME = { s: '무음', f: '어·음', r: '반복' }, COLOR = { s: 'var(--silence)', f: 'var(--filler)', r: 'var(--repeat)' };
+  CUTS.forEach(function (c) { c.on = true; });
+  function fmt(sec) { sec = Math.round(sec); return Math.floor(sec / 60) + ':' + String(sec % 60).padStart(2, '0'); }
+  function cutSum() { return CUTS.reduce(function (a, c) { return a + (c.on ? c.d : 0); }, 0); }
+
+  // 말 구간의 막대 파형. 정해진 씨앗이라 새로고침해도 모양이 같다.
+  var waveColor = getComputedStyle(document.documentElement).getPropertyValue('--wave').trim(), seed = 7, waves = {};
+  function rnd() { seed = (seed * 9301 + 49297) % 233280; return seed / 233280; }
+  function wave(key, len) {
+    if (waves[key]) return waves[key];
+    var n = Math.max(2, Math.round(len * 3)), bars = '';
+    for (var i = 0; i < n; i++) { var h = 12 + Math.round(rnd() * 26); bars += '<rect x="' + (i * 6 + 1.5) + '" y="' + (20 - h / 2) + '" width="3" height="' + h + '" rx="1.5"/>'; }
+    return (waves[key] = 'url("data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="' + 6 * n + '" height="40"><g fill="' + waveColor + '">' + bars + '</g></svg>') + '")');
+  }
+  var before = document.querySelector('[data-lane="before"]'), after = document.querySelector('[data-lane="after"]');
+  function lanes() {
+    before.textContent = ''; after.textContent = '';
+    function seg(lane, dur, cls, bg) {
       var el = document.createElement('div');
-      el.className = 'seg ' + cls;
-      el.style.setProperty('--d', dur);
-      if (bg) { el.style.backgroundImage = bg; el.style.backgroundSize = 'auto 100%'; }
-      l.appendChild(el);
+      el.className = 'ls ' + cls; el.style.setProperty('--d', dur);
+      if (bg) el.style.backgroundImage = bg;
+      lane.appendChild(el);
+    }
+    var t = 0;
+    CUTS.forEach(function (c, i) {
+      if (c.t > t) { var w = wave('t' + i, c.t - t); seg(before, c.t - t, 'talk', w); seg(after, c.t - t, 'talk', w); }
+      // 되살린 컷은 원본에서는 빈 칸으로, 다듬은 뒤에는 남은 구간으로 보인다
+      if (c.on) seg(before, c.d, c.r);
+      else { seg(before, c.d, 'kept'); seg(after, c.d, 'kept'); }
+      t = c.t + c.d;
+    });
+    if (t < TOTAL) { var w = wave('end', TOTAL - t); seg(before, TOTAL - t, 'talk', w); seg(after, TOTAL - t, 'talk', w); }
+    after.style.width = ((TOTAL - cutSum()) / TOTAL * 100) + '%';
+    // 막대를 새로 그리면 재생헤드도 다시 붙인다(재생 칸이 만들어지기 전의 첫 그리기에서는 아직 없다)
+    if (heads) { before.appendChild(heads[0]); after.appendChild(heads[1]); paint(); }
+  }
+
+  var heads = null;
+  // ── 체험판 — 영상 하나, 탭 다섯. 어느 탭에서 바꿔도 왼쪽 영상 · 자막 · 길이에 바로 나온다 ──────────
+  // 자막 14줄 — 샘플을 앱에 넣었을 때 자막 목록 그대로(시각은 원본 기준 초). '이거의'는 Whisper 가 실제로 틀린 말이다(말은 '이거에').
+  var CUES = [
+    [0.52, 5.22, '00;00;00;16', '그래서 제가 영상을 하나 그래서 제가 영상을 하나 올리겠다 하면은'],
+    [5.22, 8.38, '00;00;05;06', '한 이틀은 붙잡고 계속했던 것 같아요'],
+    [8.38, 18.7, '00;00;08;11', '그래서 20분짜리를 편집한다 하면은 최소 다섯 번을 봐'],
+    [18.7, 21.72, '00;00;18;20', '그래서 20분짜리를 편집한다 하면은'],
+    [21.72, 25.58, '00;00;21;21', '컷편집만 최소 다섯 번을 돌려보니까 한 100분?'],
+    [25.78, 27.34, '00;00;25;23', '최소 100분이죠'],
+    [35.21, 37.41, '00;00;35;05', '근데 제가 제일 답답했던 건'],
+    [37.41, 40.65, '00;00;37;11', '그 100분은 사람이 판단할 필요가 많이 없다는'],
+    [41.63, 46.21, '00;00;41;18', '근데 제가 제일 답답했던 건 근데 제가 제일 답답했던 건'],
+    [46.21, 49.41, '00;00;46;05', '그 100분은 사람의 판단이 생각보다 많이 필요 없어요'],
+    [49.41, 54.51, '00;00;49;11', '지금 제가 말하는 것만 하더라도'],
+    [54.51, 58.95, '00;00;54;14', '지금 제가 말하는 것만 하더라도 필요한 말만 남기고'],
+    [58.95, 60.71, '00;00;58;27', '나머지는 잘라서 없애면 되잖아요'],
+    [60.71, 73.89, '00;01;00;21', '근데 이거의 시간을 쓰는 게 너무 아까웠던 거죠'],
+  ].map(function (c, i) { return { i: i, a: c[0], b: c[1], tc: c[2], text: c[3], first: c[3], sfx: false, edited: false }; });
+  // 컷이 정해진 뒤의 줄 글 — 앱처럼 잘린 말은 자막에서도 빠진다(core/caption-edit.ts keptCues). 고친 줄은 고친 글 그대로
+  function keptBase(c) {
+    var map = WORDCUT[c.i] || {};
+    return c.first.split(' ').filter(function (w, j) { return !(map[j] !== undefined && CUTS[map[j]].on); }).join(' ');
+  }
+  function cueText(c) { return c.edited ? c.text : keptBase(c); }
+  // 줄의 몇째 낱말이 어느 컷에 드는지 — 앱 컷 목록의 「근거」 그대로
+  var WORDCUT = {0: {0: 0, 1: 0, 2: 0, 3: 0}, 2: {0: 1, 1: 1, 2: 1, 3: 1, 4: 1, 5: 1, 6: 1, 7: 1}, 6: {0: 4, 1: 4, 2: 4, 3: 4, 4: 4}, 7: {0: 4, 1: 4, 2: 4, 3: 4, 4: 4, 5: 4, 6: 4}, 8: {0: 4, 1: 4, 2: 4, 3: 4, 4: 4}, 10: {0: 5, 1: 5, 2: 5, 3: 5, 4: 5}};
+  // 줄 사이의 정적 — [컷, 몇째 줄 앞, 이름표]
+  var GAPS = [[0, 0, '0.5초 정적'], [1, 2, '5.4초 정적'], [4, 6, '7.7초 정적'], [4, 8, '1.0초 정적'], [5, 10, '2.5초 정적'], [6, 13, '9.5초 정적']];
+  var SFX_CUES = [0, 3, 5, 11, 13];
+  var PLAY = '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M5 3.2v9.6L12.6 8z"/></svg>';
+  function esc(s) { return s.replace(/[&<>"]/g, function (ch) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[ch]; }); }
+  // 자막은 말이 끝난 뒤 조금 더 남긴다 — 앱의 SRT 처럼 다음 줄 전까지 깜빡이지 않게
+  function cueAt(t) { return CUES.filter(function (c) { return t >= c.a && t < c.b + .4; })[0]; }
+  function cutAt(t) { return CUTS.filter(function (c) { return c.on && t >= c.t && t < c.t + c.d; })[0]; }
+
+  // 탭
+  var tabs = [].slice.call(document.querySelectorAll('[data-tab]'));
+  function openTab(name) {
+    tabs.forEach(function (b) { b.setAttribute('aria-selected', b.dataset.tab === name); b.tabIndex = b.dataset.tab === name ? 0 : -1; });
+    document.querySelectorAll('[data-panel]').forEach(function (p) { p.hidden = p.dataset.panel !== name; });
+  }
+  tabs.forEach(function (b, i) {
+    b.addEventListener('click', function () { openTab(b.dataset.tab); });
+    b.addEventListener('keydown', function (e) {
+      var d = e.key === 'ArrowRight' ? 1 : e.key === 'ArrowLeft' ? -1 : 0;
+      if (d) { var n = tabs[(i + d + tabs.length) % tabs.length]; openTab(n.dataset.tab); n.focus(); }
+    });
+  });
+  // 아래 설명에서 [체험판에서 해 보기] — 그 탭을 열고 체험판으로 올라간다
+  document.querySelectorAll('[data-try]').forEach(function (b) {
+    b.addEventListener('click', function () { openTab(b.dataset.try); document.getElementById('demo').scrollIntoView({ behavior: 'smooth', block: 'start' }); });
+  });
+
+  // 잘린 곳 — 자막 글 그대로, 잘린 말과 정적을 그 자리에 표시한다. 자막을 고치면 여기도 다시 그린다
+  var ann = document.querySelector('[data-ann]');
+  function drawAnn() {
+    var html = '';
+    for (var i = 0; i <= CUES.length; i++) {
+      GAPS.forEach(function (g) {
+        if (g[1] === i) html += '<div class="an-row gap" data-at="' + CUTS[g[0]].t + '" data-gap="' + g[0] + '"><button type="button" class="x sil" data-cut="' + g[0] + '">' + g[2] + '</button></div>';
+      });
+      if (i === CUES.length) break;
+      var c = CUES[i], words = c.text.split(' '), map = WORDCUT[i] || {};
+      // 낱말 수가 바뀌게 고쳤으면 어느 말이 잘리는지 맞출 수 없어 표시를 뗀다
+      if (words.length !== c.first.split(' ').length) map = {};
+      var line = words.map(function (w, j) {
+        var k = map[j];
+        return k === undefined ? esc(w) : '<button type="button" class="x ' + (/^[어음]$/.test(w) ? 'f' : 'r') + '" data-cut="' + k + '">' + esc(w) + '</button>';
+      }).join(' ');
+      html += '<div class="an-row" data-at="' + c.a + '" data-ci="' + i + '"><span class="tm mono">' + c.tc + '</span><span class="tx">' + line + '</span></div>';
+    }
+    ann.innerHTML = html;
+    marks();
+  }
+  // 컷이 켜졌는지에 따라 잘린 말의 모양을 바꾼다
+  function marks() {
+    ann.querySelectorAll('[data-cut]').forEach(function (el) {
+      var c = CUTS[+el.dataset.cut];
+      el.classList.toggle('off', !c.on);
+      el.setAttribute('aria-pressed', c.on);
+      el.title = c.on ? '눌러서 되살리기' : '눌러서 다시 자르기';
     });
   }
-  CUTS.forEach(function (c) {
-    if (c[0] > t) add(c[0] - t, 'talk');
-    add(c[1], 'cut ' + c[2]);
-    t = c[0] + c[1]; cut += c[1];
+  ann.addEventListener('click', function (e) {
+    var b = e.target.closest('[data-cut]');
+    if (b) { var c = CUTS[+b.dataset.cut]; c.on = !c.on; render(); return; }
+    var row = e.target.closest('[data-at]');
+    if (row) playFrom(+row.dataset.at);
   });
-  if (t < TOTAL) add(TOTAL - t, 'talk');
-  lanes[0].classList.add('marked');
-  lane.style.setProperty('--kept', ((TOTAL - cut) / TOTAL * 100) + '%');
 
-  var clock = document.querySelector('[data-clock]');
-  function fmt(s) { s = Math.round(s); return Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0'); }
-  var still = matchMedia('(prefers-reduced-motion: reduce)').matches;
-  var timers = [];
-  function reset() {
-    timers.forEach(clearTimeout); timers = [];
-    lane.classList.remove('marked', 'folded'); clock.textContent = fmt(TOTAL);
-  }
-  function play() {
-    reset();
-    if (still) { lane.classList.add('marked', 'folded'); clock.textContent = fmt(END); return; }
-    timers.push(setTimeout(function () { lane.classList.add('marked'); }, 500));
-    timers.push(setTimeout(function () {
-      lane.classList.add('folded');
-      var t0 = performance.now();
-      (function tick(now) {
-        var k = Math.min(1, (now - t0) / 800), e = 1 - Math.pow(1 - k, 3);
-        clock.textContent = fmt(TOTAL - (TOTAL - END) * e);
-        if (k < 1) requestAnimationFrame(tick);
-      })(t0);
-    }, 1600));
-  }
-  document.querySelector('[data-replay]').addEventListener('click', play);
+  // 컷 목록
+  var ctm = document.querySelector('[data-panel="list"]'), tbody = ctm.querySelector('[data-rows]'), filter = '', ambOnly = false;
+  var CHECK = '<svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 6.2l2.3 2.3 4.7-5"/></svg>';
+  CUTS.forEach(function (c, i) {
+    var tr = document.createElement('tr');
+    tr.dataset.i = i;
+    tr.innerHTML = '<td><button type="button" class="ct-tgl" aria-pressed="true" aria-label="' + c.tc + ' ' + NAME[c.r] + ' 컷 적용">' + CHECK + '</button></td>' +
+      '<td><button type="button" class="lis" aria-label="' + c.tc + ' 컷 들어 보기">' + PLAY + '</button></td>' +
+      '<td class="mono">' + c.tc + '</td><td class="mono">' + c.d.toFixed(2) + '초</td>' +
+      '<td><span class="dot" style="background:' + COLOR[c.r] + '"></span>' + NAME[c.r] + '</td><td class="why">' + c.why + '</td>';
+    tbody.appendChild(tr);
+  });
+  tbody.addEventListener('click', function (e) {
+    var tr = e.target.closest('tr');
+    if (!tr) return;
+    var c = CUTS[+tr.dataset.i];
+    if (e.target.closest('.ct-tgl')) { c.on = !c.on; render(); }
+    // 들어 보기: 컷 1초 앞부터 원본으로 듣고 컷이 끝나면 멈춘다(앱의 들어 보기와 같다)
+    else if (e.target.closest('.lis')) { preview = c.t + c.d + .5; media.currentTime = lastT = Math.max(0, c.t - 1); if (media.paused) media.play(); }
+  });
+  ctm.querySelector('[data-filter]').addEventListener('click', function (e) {
+    var b = e.target.closest('button');
+    if (!b) return;
+    filter = b.dataset.f;
+    this.querySelectorAll('button').forEach(function (x) { x.setAttribute('aria-pressed', x === b); });
+    render();
+  });
+  ctm.querySelector('[data-amb]').addEventListener('click', function () { ambOnly = !ambOnly; this.setAttribute('aria-pressed', ambOnly); render(); });
 
-  function once(el, fn) {
-    if (!('IntersectionObserver' in window)) return fn();
-    var io = new IntersectionObserver(function (es) { if (es[0].isIntersecting) { io.disconnect(); fn(); } }, { threshold: .5 });
-    io.observe(el);
+  // 자막 고치기 — 줄마다 듣기. 고친 글은 영상 자막 · 잘린 곳 · 효과음 칸에 그대로 나온다
+  var subPanel = document.querySelector('[data-panel="sub"]'), cueBox = subPanel.querySelector('[data-cues]');
+  CUES.forEach(function (c) {
+    var row = document.createElement('label');
+    row.className = 'sl-row';
+    row.innerHTML = '<button type="button" class="lis" aria-label="' + c.tc + ' 줄부터 듣기">' + PLAY + '</button><span class="tm mono">' + c.tc + '</span><input aria-label="' + c.tc + ' 자막"><span class="tags"></span>';
+    var inp = row.querySelector('input'), tags = row.querySelector('.tags');
+    inp.value = cueText(c);
+    // 이 줄에서 잘리는 길이 — 컷이 줄 밖까지 이어져도 줄 안에 든 만큼만 센다
+    var gone = CUTS.reduce(function (n, k) { return n + Math.max(0, Math.min(k.t + k.d, c.b) - Math.max(k.t, c.a)); }, 0);
+    if (gone >= .05) tags.innerHTML = '<span class="tag mono">✂ −' + gone.toFixed(1) + '초</span>';
+    inp.addEventListener('input', function () {
+      c.edited = inp.value !== keptBase(c);
+      c.text = c.edited ? inp.value : c.first;
+      var mark = tags.querySelector('.edit');
+      if (c.edited && !mark) tags.insertAdjacentHTML('afterbegin', '<span class="tag edit">고침</span>');
+      if (!c.edited && mark) mark.remove();
+      var n = cueBox.querySelectorAll('.tag.edit').length;
+      subPanel.querySelector('[data-edits]').textContent = n ? '고침 ' + n : '';
+      c.sfxText.textContent = cueText(c) || c.first;
+      drawAnn(); paint();
+    });
+    row.querySelector('.lis').addEventListener('click', function (e) { e.preventDefault(); playFrom(c.a); });
+    c.row = row; c.inp = inp;
+    cueBox.appendChild(row);
+  });
+
+  // 효과음 — 점선은 제안, 누르면 들어 보고 받는다. 받은 것은 재생하다 그 줄에 닿으면 울린다
+  var sfxPanel = document.querySelector('[data-panel="sfx"]'), sfxRows = sfxPanel.querySelector('[data-sfx-rows]');
+  var pop = new Audio('sfx/pop.mp3'), all = sfxPanel.querySelector('[data-sfx-all]'), sfxOn = true;
+  function ring(el) {
+    try { var a = pop.cloneNode(); a.volume = .6; a.play().catch(function () {}); } catch (e) {}
+    if (el) { el.classList.remove('ping'); void el.offsetWidth; el.classList.add('ping'); }
   }
-  once(lane, play);
+  function count() {
+    var n = sfxPanel.querySelectorAll('.tag.sfx.sug').length;
+    all.textContent = '제안 ' + n + '개 받기'; all.disabled = !n;
+  }
+  CUES.forEach(function (c, i) {
+    var row = document.createElement('div');
+    row.className = 'sl-row';
+    row.innerHTML = '<span class="tm mono">' + c.tc + '</span><span class="txt"></span><span class="tags"></span>';
+    c.sfxText = row.querySelector('.txt');
+    c.sfxText.textContent = cueText(c) || c.first;
+    if (SFX_CUES.indexOf(i) >= 0) {
+      var b = document.createElement('button');
+      b.type = 'button'; b.className = 'tag sfx sug'; b.textContent = '♫ 뽁'; b.title = '제안: 팝_뽁 — 눌러서 들어 보고 받기';
+      b.addEventListener('click', function () { take(b, c); ring(b); count(); });
+      c.sfxBtn = b;
+      row.querySelector('.tags').appendChild(b);
+    }
+    sfxRows.appendChild(row);
+  });
+  function take(b, c) { b.classList.remove('sug'); b.title = '효과음 팝_뽁'; c.sfx = true; }
+  all.addEventListener('click', function () {
+    var first = null;
+    CUES.forEach(function (c) { if (c.sfxBtn && !c.sfx) { take(c.sfxBtn, c); first = first || c.sfxBtn; } });
+    if (first) ring(first);
+    count();
+  });
+  sfxPanel.querySelector('[data-sfx-on]').addEventListener('click', function () {
+    sfxOn = this.getAttribute('aria-pressed') !== 'true';
+    this.setAttribute('aria-pressed', sfxOn); sfxPanel.classList.toggle('sfx-off', !sfxOn);
+  });
+  count();
+
+  // 자막 모양 — 앱의 템플릿 값(src/core/caption-style.ts). 크기는 1080 높이 기준이고, 왼쪽 영상이 곧 미리보기다
+  var BASE = { size: 52, bold: true, color: '#ffffff', outline: 1, shadow: 4, box: false, align: 'bottom', margin: 150 };
+  var TPL = {
+    outline: [{}, '브이로그 · 인터뷰의 말 자막이에요. 가볍고 어떤 배경에서도 읽혀요.'],
+    yellow: [{ color: '#ffd84d' }, '기본과 같은 꼴에 색만 노랑이에요. 말하는 사람을 가르거나 속마음 · 덧붙임에 써요.'],
+    effect: [{ size: 84, outline: 2, shadow: 7, align: 'middle', margin: 0 }, '상황 · 효과음 자막이에요. 화면 가운데에 크게, 그림자를 진하게.'],
+    box: [{ box: true, outline: 10, shadow: 0, bold: false, size: 46, margin: 120 }, '배경이 밝거나 복잡해 글자가 묻힐 때 가장 잘 읽혀요.'],
+    minimal: [{ size: 40, bold: false, shadow: 3, margin: 90 }, '화면을 가리면 안 될 때 써요. 강의 · 설명 영상에 잘 맞아요.'],
+    top: [{ align: 'top', margin: 90 }, '아래에 다른 그래픽이 있을 때 위로 올려요.'],
+  };
+  var vbox = document.querySelector('.vbox'), capBox = document.querySelector('[data-capbox-main]'), cap = document.querySelector('[data-cap-main]'), tpl = 'outline';
+  var tplNote = document.querySelector('[data-tpl-note]');
+  function styleCap() {
+    var st = Object.assign({}, BASE, TPL[tpl][0]), k = vbox.clientHeight / 1080, px = function (v) { return (v * k).toFixed(2) + 'px'; };
+    cap.style.cssText = 'font-size:' + px(st.size) + ';font-weight:' + (st.bold ? 600 : 400) + ';color:' + st.color + ';line-height:1.3;' +
+      (st.box ? 'background:rgba(0,0,0,.55);padding:' + px(st.outline * .6) + ' ' + px(st.outline) + ';border-radius:' + px(4) + ';'
+              : st.outline ? '-webkit-text-stroke:' + px(st.outline * 2) + ' #1a1a1a;paint-order:stroke fill;' : '') +
+      (st.shadow ? 'text-shadow:' + px(st.shadow * .6) + ' ' + px(st.shadow * .6) + ' ' + px(st.shadow) + ' #000;' : '');
+    capBox.style.top = capBox.style.bottom = capBox.style.transform = '';
+    if (st.align === 'bottom') capBox.style.bottom = px(st.margin);
+    else if (st.align === 'top') capBox.style.top = px(st.margin);
+    else { capBox.style.top = '50%'; capBox.style.transform = 'translateY(-50%)'; }
+    tplNote.textContent = TPL[tpl][1];
+  }
+  document.querySelector('[data-tpl]').addEventListener('click', function (e) {
+    var b = e.target.closest('button');
+    if (!b) return;
+    tpl = b.dataset.t;
+    this.querySelectorAll('button').forEach(function (x) { x.setAttribute('aria-pressed', x === b); });
+    styleCap(); paint();
+  });
+  if ('ResizeObserver' in window) new ResizeObserver(styleCap).observe(vbox);
+  styleCap();
+
+  // 재생 — 영상 하나를 모두가 같이 쓴다. 원본은 그대로, 띵컷 후는 켜 둔 컷을 건너뛴다(앱의 [편집 후]와 같다)
+  var media = document.querySelector('[data-media]'), mode = 'raw', ticking = false, preview = null, lastT = 0, started = false;
+  // 통째로 받아 blob 으로 튼다 — 범위 요청을 못 받는 서버(파이썬 http.server 등)에서는 옮겨 보지 못한다. 3MB 남짓이다.
+  fetch(media.dataset.src).then(function (r) { return r.blob(); }).then(function (b) { media.src = URL.createObjectURL(b); })
+    .catch(function () { media.src = media.dataset.src; });
+  heads = [before, after].map(function (lane) { var d = document.createElement('div'); d.className = 'ph'; d.hidden = true; lane.appendChild(d); return d; });
+  function edited(t) { return t - CUTS.reduce(function (a, c) { return a + (c.on ? Math.max(0, Math.min(t, c.t + c.d) - c.t) : 0); }, 0); }
+  function original(e) {
+    // 다듬은 뒤의 시각 → 원본 시각. 켜 둔 컷을 차례로 건너뛰며 센다
+    var t = e;
+    CUTS.forEach(function (c) { if (c.on && t >= c.t) t += c.d; });
+    return Math.min(t, TOTAL);
+  }
+  var playBtns = document.querySelectorAll('[data-play]'), timeEls = document.querySelectorAll('[data-time]'), miniCap = document.querySelector('[data-mini-cap]');
+  var nowKey = null;
+  // 열린 탭 안에서만 지금 줄을 따라 내려간다(페이지는 움직이지 않는다)
+  function follow(el) {
+    var box = el && el.closest('[data-panel]');
+    if (!box || box.hidden) return;
+    var top = el.offsetTop - box.offsetTop, bottom = top + el.offsetHeight;
+    if (top < box.scrollTop || bottom > box.scrollTop + box.clientHeight) box.scrollTop = top - 48;
+  }
+  function paint() {
+    if (!media) return;
+    var t = media.currentTime || 0, kept = TOTAL - cutSum(), inCut = cutAt(t), playing = !media.paused;
+    heads[0].hidden = false; heads[0].style.left = (t / TOTAL * 100) + '%';
+    heads[1].hidden = !!inCut; heads[1].style.left = (edited(t) / kept * 100) + '%';
+    var label = mode === 'edit' ? fmt(edited(t)) + ' / ' + fmt(kept) : fmt(t) + ' / ' + fmt(TOTAL);
+    timeEls.forEach(function (el) { el.textContent = label; });
+    var cue = cueAt(t), active = playing || t > 0;
+    cap.textContent = cue && active ? (mode === 'edit' ? cueText(cue) : cue.text) : '';
+    if (miniCap) miniCap.textContent = cue ? cue.text : '';
+    // 지금 줄: 잘린 곳 탭은 정적 칸까지, 자막 탭은 자막 줄만
+    var key = !active ? null : inCut && !cue ? 'g' + CUTS.indexOf(inCut) : cue ? 'c' + CUES.indexOf(cue) : null;
+    if (key !== nowKey) {
+      ann.querySelectorAll('.an-row').forEach(function (r) {
+        var k = r.dataset.gap !== undefined ? 'g' + r.dataset.gap : 'c' + r.dataset.ci;
+        r.classList.toggle('now', k === key);
+        if (k === key && playing) follow(r);
+      });
+      CUES.forEach(function (c) { c.row.classList.toggle('now', c === cue && active); });
+      if (cue && playing) follow(cue.row);
+      nowKey = key;
+    }
+    tbody.querySelectorAll('tr').forEach(function (tr) { tr.classList.toggle('now', playing && CUTS[+tr.dataset.i] === inCut); });
+  }
+  function tick() {
+    var t = media.currentTime;
+    if (preview !== null && t >= preview) { media.pause(); preview = null; }
+    else if (mode === 'edit' && preview === null) {
+      var c = cutAt(t);
+      // 끝 컷을 건너뛰면 갈 곳이 없다 — 끝에 세우고 멈춘다(끝으로 옮기기만 하면 ended 가 오지 않아 계속 '재생 중'이다)
+      if (c && c.t + c.d >= TOTAL - .05) { media.pause(); media.currentTime = TOTAL; }
+      else if (c) { media.currentTime = c.t + c.d + .01; lastT = media.currentTime; }
+    }
+    // 받은 효과음은 그 줄 처음에 닿을 때 울린다. 건너뛰거나 옮겨 간 자리에서는 울리지 않는다
+    t = media.currentTime;
+    if (sfxOn && t > lastT && t - lastT < .5) CUES.forEach(function (c) { if (c.sfx && lastT < c.a && t >= c.a) ring(); });
+    lastT = t;
+    paint();
+    if (!media.paused) requestAnimationFrame(tick); else ticking = false;
+  }
+  function setIcons(playing) {
+    playBtns.forEach(function (b) {
+      b.querySelector('[data-icon]').setAttribute('d', playing ? 'M4 3h3v10H4zM9 3h3v10H9z' : 'M5 3.2v9.6L12.6 8z');
+      b.setAttribute('aria-label', playing ? '멈추기' : '재생');
+    });
+  }
+  playBtns.forEach(function (b) {
+    b.addEventListener('click', function () {
+      preview = null;
+      if (media.paused) { if (media.ended || media.currentTime >= TOTAL - .05) media.currentTime = 0; lastT = media.currentTime; media.play(); }
+      else media.pause();
+    });
+  });
+  media.addEventListener('play', function () { started = true; mini(); setIcons(true); if (!ticking) { ticking = true; tick(); } });
+  media.addEventListener('pause', function () { setIcons(false); paint(); });
+  media.addEventListener('ended', function () { setIcons(false); paint(); });
+  media.addEventListener('loadeddata', paint);
+  media.addEventListener('click', function () { playBtns[0].click(); });
+  document.querySelectorAll('[data-mode]').forEach(function (g) {
+    g.addEventListener('click', function (e) {
+      var b = e.target.closest('button');
+      if (!b) return;
+      mode = b.dataset.m;
+      document.querySelectorAll('[data-mode] button').forEach(function (x) { x.setAttribute('aria-pressed', x.dataset.m === mode); });
+      paint();
+    });
+  });
+  function playFrom(t) { preview = null; media.currentTime = lastT = t; paint(); if (media.paused) media.play(); }
+  // 막대를 누르면 그 자리로. 위 막대는 원본 시각, 아래 막대는 다듬은 뒤의 시각이다
+  before.addEventListener('click', function (e) { var r = before.getBoundingClientRect(); media.currentTime = lastT = (e.clientX - r.left) / r.width * TOTAL; paint(); });
+  after.addEventListener('click', function (e) { var r = after.getBoundingClientRect(); media.currentTime = lastT = original((e.clientX - r.left) / r.width * (TOTAL - cutSum())); paint(); });
+
+  // 따라다니는 재생 막대 — 한 번 틀고 나서 체험판이 화면 밖으로 나가면 나온다
+  var miniBar = document.querySelector('[data-mini]'), demoSeen = true;
+  function mini() { miniBar.hidden = !started || demoSeen; }
+  if ('IntersectionObserver' in window) {
+    new IntersectionObserver(function (es) { demoSeen = es[0].isIntersecting; mini(); }).observe(document.getElementById('demo'));
+  }
+
+  function render() {
+    var sum = cutSum(), on = CUTS.filter(function (c) { return c.on; }).length;
+    marks();
+    document.querySelector('[data-len]').textContent = fmt(TOTAL - sum);
+    document.querySelector('[data-saved]').textContent = on ? on + '곳에서 ' + Math.round(sum) + '초를 덜어 냈어요' : '하나도 자르지 않았어요';
+    tbody.querySelectorAll('tr').forEach(function (tr) {
+      var c = CUTS[+tr.dataset.i];
+      tr.hidden = (filter && c.r !== filter) || (ambOnly && !c.amb);
+      tr.classList.toggle('off', !c.on);
+      tr.querySelector('.ct-tgl').setAttribute('aria-pressed', c.on);
+    });
+    CUES.forEach(function (c) {
+      if (!c.inp) return;
+      var left = cueText(c);
+      if (!c.edited && document.activeElement !== c.inp) c.inp.value = left || c.first;
+      c.row.classList.toggle('cut', left === '');
+      c.inp.readOnly = left === '';
+      c.sfxText.textContent = left || c.first;
+    });
+    ctm.querySelector('[data-applied]').textContent = on + ' / ' + CUTS.length + ' 적용';
+    ctm.querySelector('[data-sum]').innerHTML = '1:15 → <b>' + fmt(TOTAL - sum) + '</b> · ' + fmt(sum) + ' 줄어듦';
+    lanes();
+  }
+  drawAnn();
+  render();
 })();
 </script>
 </body>
