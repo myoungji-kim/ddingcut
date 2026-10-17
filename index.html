@@ -295,6 +295,9 @@ details[open] summary::after { content: '−'; }
 details > div { padding: 0 0 24px; color: var(--fg-2); max-width: 720px; }
 details ol { margin: 0; padding-left: 1.3em; }
 details li { margin-bottom: 6px; }
+.shot { position: relative; margin: 10px 0 18px; border-radius: 8px; overflow: hidden; border: 1px solid var(--line); }
+.shot img { display: block; width: 100%; height: auto; }
+.shot i { position: absolute; border: 3px solid #FFD43B; border-radius: 6px; box-shadow: 0 0 0 2px rgba(0, 0, 0, .35); }
 code { font: 14px ui-monospace, 'Cascadia Mono', Consolas, Menlo, monospace; background: var(--bg-2); border: 1px solid var(--line); border-radius: 6px; padding: 2px 6px; overflow-wrap: anywhere; }
 pre { margin: 10px 0 0; white-space: pre-wrap; }
 
@@ -585,8 +588,10 @@ footer p + p { margin-top: 6px; }
         <summary>Windows 에서 “PC 보호” 창이 떠요</summary>
         <div>
           <ol>
-            <li>“Windows의 PC 보호” 창에서 <b>[추가 정보]</b>를 눌러요.</li>
-            <li><b>[실행]</b>을 눌러요. 다음부터는 바로 켜져요.</li>
+            <li>“Windows의 PC 보호” 창에서 <b>[추가 정보]</b>를 눌러요. 버튼이 아니라 본문 아래의 작은 밑줄 글자예요.
+              <div class="shot"><img src="img/smartscreen-1.png" alt="PC 보호 창. 본문 아래 밑줄 글자 ‘추가 정보’가 노란 테두리로 표시되어 있다" width="961" height="510" loading="lazy"><i style="left:2.4%;top:28.5%;width:10.6%;height:7.5%"></i></div></li>
+            <li><b>[실행]</b>을 눌러요. 다음부터는 바로 켜져요.
+              <div class="shot"><img src="img/smartscreen-2.png" alt="‘추가 정보’를 누르면 [실행] 버튼이 나타난다. 노란 테두리로 표시되어 있다" width="967" height="504" loading="lazy"><i style="left:63%;top:51%;width:9.4%;height:10%"></i></div></li>
           </ol>
         </div>
       </details>
