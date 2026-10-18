@@ -6,7 +6,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/myoungji-kim/ddingcut/releases/latest/download/DDingCut-Setup.exe"><b>Windows 받기</b></a>
+  <a href="https://myoungji-kim.github.io/ddingcut/#get"><b>Windows 받기</b></a>
   &nbsp;·&nbsp;
   <a href="https://github.com/myoungji-kim/ddingcut/releases/latest"><b>Mac 받기</b></a>
   &nbsp;·&nbsp;
@@ -32,11 +32,11 @@
 
 | 컴퓨터 | 파일 |
 | --- | --- |
-| Windows 10 · 11 (64비트) | `DDingCut-Setup.exe` |
-| Mac (M1 이후) | `DDingCut-mac-arm64.dmg` |
-| Mac (Intel) | `DDingCut-mac-x64.dmg` |
+| Windows 10 · 11 (64비트) | `DDingCut-Setup-<판>.exe` |
+| Mac (M1 이후) | `DDingCut-mac-arm64-<판>.dmg` |
+| Mac (Intel) | `DDingCut-mac-x64-<판>.dmg` |
 
-[Releases](https://github.com/myoungji-kim/ddingcut/releases/latest) 맨 위 판에서 받아요. 빈 공간 5GB가 필요하고, macOS 12 이상이에요.
+[소개 페이지](https://myoungji-kim.github.io/ddingcut/#get)의 받기 단추가 알맞은 파일을 골라 줘요. 직접 고르려면 [Releases](https://github.com/myoungji-kim/ddingcut/releases/latest) 맨 위 판에서 받아요. 파일 이름의 `<판>`은 판 번호(예: 0.3.6)예요. 빈 공간 5GB가 필요하고, macOS 12 이상이에요.
 
 ## 처음 켤 때
 
