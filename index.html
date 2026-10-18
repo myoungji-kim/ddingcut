@@ -738,6 +738,14 @@ footer p + p { margin-top: 6px; }
     .then(function (j) { rel = j; sync(current); }).catch(function () {});
   sync(mac ? 'DDingCut-mac-arm64.dmg' : 'DDingCut-Setup.exe');
 
+  // 받기 클릭을 센다(방문 통계: GoatCounter — 쿠키 없음, 개인정보 저장 없음). 스크립트가 막혔거나 아직 안 왔으면 조용히 넘어간다.
+  document.querySelectorAll('[data-dl]').forEach(function (a) {
+    a.addEventListener('click', function () {
+      var gc = window.goatcounter;
+      if (gc && gc.count) gc.count({ path: 'download/' + file(), title: '받기 ' + file(), event: true });
+    });
+  });
+
   // 샘플(촬영 원본 1분 15초)의 컷. 이 페이지의 영상 소리(media/sample.mp4)와 원본 전체에서 잘라 온 자막을 앱에 넣었을 때 컷 목록에 나온 그대로다.
   // ponytail: 손으로 옮겨 적었다. 소리를 다시 만들거나 탐지 기본값을 바꾸면 앱의 컷 목록을 보고 다시 옮긴다.
   var TOTAL = 74.5;
@@ -1135,5 +1143,6 @@ footer p + p { margin-top: 6px; }
   render();
 })();
 </script>
+<script data-goatcounter="https://ddingcut.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
 </body>
 </html>
