@@ -60,7 +60,9 @@ xattr -dr com.apple.quarantine /Applications/DDingCut.app
 
 ## 문제 알리기
 
-[여기](https://github.com/myoungji-kim/ddingcut/issues/new?template=bug.yml)에 적어 주세요. 제안 · 질문은 [빈 이슈](https://github.com/myoungji-kim/ddingcut/issues/new)로 받아요.
+**[의견 · 문의 보내기](https://docs.google.com/forms/d/e/1FAIpQLSd2314k81K50JMC6Rwv-b1DKJPaS_r3S4v5OIFmmxuEBM4D0g/viewform)** — 불편한 점 · 질문 · 응원 모두 환영해요. 계정 없이 1분이면 돼요.
+
+GitHub 계정이 있다면 [문제 신고](https://github.com/myoungji-kim/ddingcut/issues/new?template=bug.yml)나 [빈 이슈](https://github.com/myoungji-kim/ddingcut/issues/new)로도 받아요.
 
 <br>
 
